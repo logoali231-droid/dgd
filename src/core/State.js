@@ -1,8 +1,8 @@
 import { CONFIG } from '../data/config.js';
-import { Persistence } from './Persistence.js';
+import { Persistance } from './Persistance.js';
 
 // Load persistent data once
-const save = Persistence.load();
+const save = Persistance.load();
 
 // Build the run state
 export const state = {

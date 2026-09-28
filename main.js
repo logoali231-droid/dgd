@@ -1,5 +1,5 @@
 // 1. Imports
-import { startGameLoop } from './src/core/GameLoop.js';
+import { startGameLoop } from './src/core/gameLoop.js';
 import { state } from './src/core/State.js';
 
 // 2. Debug helper
