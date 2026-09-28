@@ -1,0 +1,109 @@
+/dont-get-deactivated
+│
+├── index.html                  <-- The entry point. The shell.
+├── main.js                     <-- Bootstraps the game. Imports modules, starts the loop.
+├── README.md                   <-- Your personal notes on how the game works.
+│
+├── styles/                     <-- All CSS goes here.
+│   ├── variables.css           <-- Colors (lime, dark grays), fonts, sizes.
+│   ├── layout.css              <-- Flexbox/Grid for the main screen, HUD, and menus.
+│   └── components.css          <-- Buttons, stat bars, order cards, popups.
+│
+├── src/                        <-- All JavaScript logic goes here.
+│   │
+│   ├── core/                   <-- The Engine (The "Brain")
+│   │   ├── GameLoop.js         <-- The requestAnimationFrame loop & delta time math.
+│   │   ├── State.js            <-- The single source of truth (Rating, Energy, Cash).
+│   │   └── EventBus.js         <-- (Optional) A pub/sub system to decouple systems.
+│   │
+│   ├── systems/                <-- The Rules & Mechanics
+│   │   ├── ShiftTimer.js       <-- Handles the 12-hour countdown and phases.
+│   │   ├── OrderManager.js     <-- Spawns orders, handles accept/decline logic.
+│   │   ├── HazardSystem.js     <-- Handles potholes, dogs, cars, rain.
+│   │   ├── RatingSystem.js     <-- Calculates stars, tips, and deactivations.
+│   │   └── UpgradeSystem.js    <-- Manages meta-progression purchases.
+│   │
+│   ├── ui/                     <-- The Visuals (DOM Manipulation)
+│   │   ├── HUD.js              <-- Updates the stat bars on screen.
+│   │   ├── ScreenManager.js    <-- Toggles between Start, Game, Shop, and Death screens.
+│   │   └── LogbookUI.js        <-- Renders the Deactivation Encyclopedia.
+│   │
+│   ├── data/                   <-- Pure Data (No logic, just information)
+│   │   ├── logbookEntries.js   <-- Array of funny deactivation reasons.
+│   │   ├── upgrades.js         <-- Array of shop items, costs, and effects.
+│   │   └── customerTypes.js    <-- Array of customer archetypes (Drunk, Ghost, etc.).
+│   │
+│   └── utils/                  <-- Helper Functions
+│       ├── math.js             <-- Clamp, randomInt, formatCurrency.
+│       └── dom.js              <-- Shortcuts for document.querySelector.
+│
+└── assets/                     <-- Media (This is what you'll search for!)
+    │
+    ├── sprites/                <-- 2D Images / Pixel Art (PNG or SVG)
+    │   │
+    │   ├── characters/         <-- The player and couriers
+    │   │   ├── player_bike_idle.png
+    │   │   ├── player_bike_pedaling.png
+    │   │   ├── player_walking_tired.png
+    │   │   ├── player_fainted.png
+    │   │   └── npc_courier_friend.png
+    │   │
+    │   ├── customers/          <-- The people you deliver to
+    │   │   ├── customer_happy.png
+    │   │   ├── customer_impatient.png
+    │   │   ├── customer_drunk.png
+    │   │   ├── customer_ghost_door.png
+    │   │   └── customer_perfectionist.png
+    │   │
+    │   ├── hazards/            <-- Obstacles on the road
+    │   │   ├── hazard_car_door.png
+    │   │   ├── hazard_stray_dog.png
+    │   │   ├── hazard_pothole.png
+    │   │   ├── hazard_construction_cone.png
+    │   │   └── hazard_rain_cloud.png
+    │   │
+    │   ├── items/              <-- The food and gear
+    │   │   ├── item_pizza_box.png
+    │   │   ├── item_soup_container.png
+    │   │   ├── item_coffee_cup.png
+    │   │   ├── item_milkshake.png
+    │   │   ├── item_generic_bag.png
+    │   │   ├── item_phone_dead.png
+    │   │   └── item_power_bank.png
+    │   │
+    │   ├── ui/                 <-- Icons and UI elements
+    │   │   ├── ui_star_full.png
+    │   │   ├── ui_star_empty.png
+    │   │   ├── ui_battery_icon.png
+    │   │   ├── ui_energy_icon.png
+    │   │   ├── ui_cash_icon.png
+    │   │   └── ui_button_apologize.png
+    │   │
+    │   ├── logbook/            <-- Specific pixel art for the Deactivation Index
+    │   │   ├── log_pixel_soup_warm.png
+    │   │   ├── log_pixel_dog_stealing.png
+    │   │   ├── log_pixel_taco_crash.png
+    │   │   ├── log_pixel_pizza_face_down.png
+    │   │   └── log_pixel_phone_died.png
+    │   │
+    │   └── backgrounds/        <-- Maps and menus
+    │       ├── bg_city_map_day.png
+    │       ├── bg_city_map_night.png
+    │       ├── bg_apartment_hallway.png
+    │       └── bg_shop_menu.png
+    │
+    └── audio/                  <-- Sound Effects & Music (MP3, WAV, or OGG)
+        │
+        ├── sfx/                <-- Short sounds
+        │   ├── sfx_order_ding.wav
+        │   ├── sfx_deactivation_buzz.wav
+        │   ├── sfx_cash_register.wav
+        │   ├── sfx_bike_bell.wav
+        │   ├── sfx_dog_bark.wav
+        │   ├── sfx_car_horn.wav
+        │   └── sfx_phone_dying_beep.wav
+        │
+        └── music/              <-- Looping background tracks
+            ├── music_lofi_calm.ogg
+            ├── music_tension_rush.ogg
+            └── music_game_over_sad.ogg

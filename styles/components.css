@@ -1,0 +1,56 @@
+.stat-box {
+    background-color: var(--bg-box);
+    border: 2px solid var(--text-muted);
+    padding: 8px;
+    flex: 1 1 calc(33.333% - 6px); /* Distribui em colunas flexíveis */
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 100px;
+}
+
+.label {
+    font-size: 8px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+}
+
+#ui-rating, #ui-energy, #ui-battery, #ui-cash, #ui-time {
+    font-size: 10px;
+    color: var(--lime-green);
+}
+
+#game-state-text {
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--text-white);
+}
+
+#start-btn {
+    font-family: var(--font-pixel);
+    font-size: 12px;
+    background-color: var(--lime-green);
+    color: var(--bg-main);
+    border: 4px solid #ffffff;
+    padding: 16px 24px;
+    cursor: pointer;
+    box-shadow: 0 4px 0 #1b8a00;
+}
+
+#start-btn:active {
+    transform: translateY(4px);
+    box-shadow: none;
+}
+
+.popup-card {
+    background-color: var(--bg-box);
+    border: 4px solid var(--text-muted);
+    padding: 20px;
+    width: 90%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+    display: none; 
+}

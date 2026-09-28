@@ -1,0 +1,14 @@
+@import url('https://googleapis.com');
+
+:root {
+    /* Cores solicitadas (Grays escuros e Lime Green) */
+    --bg-main: #0c0c0e;
+    --bg-container: #16161a;
+    --bg-box: #222227;
+    --lime-green: #39ff14;
+    --text-white: #ffffff;
+    --text-muted: #787880;
+
+    /* Tipografia */
+    --font-pixel: 'Press Start 2P', monospace;
+}

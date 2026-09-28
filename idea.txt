@@ -1,0 +1,366 @@
+# DON'T GET DEACTIVATED!
+### *A Gig Economy Rogue-Lite Survival Game*
+
+---
+
+## 🎮 EXPANDED GAME CONCEPT
+
+### Tagline: *"You're not an employee. You're a line item."*
+
+---
+
+## 1. CORE LOOP (Refined)
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                     12-HOUR SHIFT TIMER                          │
+│  ┌───────────────────────────────────────────────────────────┐  │
+│  │  [ORDER QUEUE]  →  [ACCEPT/DECLINE]  →  [NAVIGATE]        │  │
+│  │        ↓                                      ↓           │  │
+│  │  [PICKUP ZONE]  →  [TRANSIT/DODGE]  →  [DROPOFF ZONE]     │  │
+│  │        ↓                                      ↓           │  │
+│  │  [RATING UPDATE]  ←  [CUSTOMER INTERACTION]  ←  [TIP CALC]│  │
+│  └───────────────────────────────────────────────────────────┘  │
+│                              ↓                                   │
+│              [SHIFT END] or [DEACTIVATION]                       │
+│                              ↓                                   │
+│         [LOGBOOK ENTRY]  →  [META SHOP]  →  [NEW RUN]           │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+**The Shift Structure:**
+- **6 AM - 10 AM**: Morning Rush (Coffee orders, breakfast, high volume)
+- **10 AM - 2 PM**: Lunch Surge (Food delivery, office buildings, elevator waits)
+- **2 PM - 5 PM**: Dead Zone (Fewer orders, but "surge pricing" tempts you to keep going)
+- **5 PM - 9 PM**: Dinner Chaos (Peak orders, angry customers, traffic hell)
+- **9 PM - 12 AM**: Late Night (Drunk orders, sketchy neighborhoods, 2x tips)
+
+Each shift phase has **different risk/reward ratios** and **unique customer types**.
+
+---
+
+## 2. LIVE STAT BARS (Expanded)
+
+### Primary Stats:
+
+| Stat | Range | Depletion Rate | Restore Method |
+|------|-------|----------------|----------------|
+| **⭐ App Rating** | 0.0 - 5.0 | Drops per bad delivery | Perfect deliveries, apologies |
+| **⚡ Energy** | 0 - 100% | Rides, stairs, stress | Food, energy drinks, breaks |
+| **🔋 Phone Battery** | 0 - 100% | Time, GPS, calls | Power banks, charging spots |
+| **💵 Cash** | $0 - ∞ | Repairs, food, upgrades | Deliveries, tips, bonuses |
+| **😤 Stress Meter** | 0 - 100% | Bad customers, traffic | Music, deep breaths, pets |
+| **⏱️ Shift Timer** | 12:00:00 | Always ticking | N/A |
+
+### Secondary/Hidden Stats:
+
+| Stat | Effect |
+|------|--------|
+| **📊 Acceptance Rate** | Below 70% = Algorithm penalizes you |
+| **🚴 Bike Condition** | Damaged bike = slower, more energy drain |
+| **🌡️ Food Temperature** | Affects rating & tip based on delivery time |
+| **😊 Customer Mood** | Hidden per-order; affects complaint probability |
+| **📱 App Algorithm Mood** | "Random" events, surge pricing, deactivation risk |
+
+---
+
+## 3. THE DEACTIVATION INDEX (Failure Encyclopedia)
+
+### Categories of Deactivation:
+
+#### 🍕 FOOD INTEGRITY VIOLATIONS
+- **#001**: "Pizza tilted 2 degrees. Customer filmed it. Viral tweet. Deactivated."
+- **#023**: "Sushi arrived at 71°F. Health code violation flagged. Deactivated."
+- **#047**: "Milkshake melted. Customer called it 'soup.' Deactivated."
+- **#112**: "Taco shell cracked. AI determined 'intentional sabotage.' Deactivated."
+
+#### ⏰ TIME CRIMES
+- **#007**: "Arrived 31 seconds past ETA. Customer was 'hangry.' Deactivated."
+- **#034**: "Took 90-second bathroom break during surge. Flagged as 'productivity theft.' Deactivated."
+- **#089**: "Waited for elevator for 4 minutes. Algorithm says you should've 'used stairs.' Deactivated."
+
+#### 🤖 ALGORITHM MISUNDERSTANDINGS
+- **#056**: "App GPS glitched; marked you as 'teleporting.' Flagged for fraud. Deactivated."
+- **#078**: "Accepted order while sneezing. AI detected 'erratic behavior.' Deactivated."
+- **#134**: "Phone died at 11:58 PM. App assumed you 'abandoned shift.' Deactivated."
+- **#201**: "Customer's dog barked at you. Audio AI flagged 'aggressive behavior.' Deactivated."
+
+#### 👤 CUSTOMER ENCOUNTERS
+- **#012**: "Customer's soup was 'warm, not piping hot.' Left 1-star. Deactivated."
+- **#045**: "Customer wanted you to bring food to 14th floor. Elevator broken. They didn't tip. Deactivated."
+- **#067**: "Customer ordered to wrong address. Blamed you. Deactivated."
+- **#099**: "Customer's cat sat on the bag. They reported 'foreign contaminants.' Deactivated."
+- **#156**: "Delivered to customer in bathrobe. They felt 'judged.' Deactivated."
+
+#### 🚴 PHYSICAL IMPOSSIBILITY
+- **#019**: "Hit pothole. Wings flew into storm drain. Deactivated."
+- **#038**: "Stray dog stole burrito. Customer saw. Deactivated."
+- **#071**: "Car doored you. Food survived. You didn't. Deactivated."
+- **#103**: "Rained so hard bag flooded. Delivered soup. It was now 'soup soup.' Deactivated."
+
+#### 💀 ABSURDIST DEACTIVATIONS (Rare)
+- **#404**: "You were deactivated before your first delivery. Reason: 'Preemptive deactivation based on predictive modeling.'"
+- **#666**: "Accepted order from yourself. AI flagged 'existential loop.' Deactivated."
+- **#777**: "Delivered food so perfectly, customer suspected you were a robot. Reported you. Deactivated."
+
+---
+
+## 4. META-PROGRESSION (Expanded Upgrade Tree)
+
+### 🚲 VEHICLE UPGRADES
+| Upgrade | Cost | Effect |
+|---------|------|--------|
+| **E-Bike Conversion** | $500 | +20% speed, -10% energy drain |
+| **Reinforced Tires** | $300 | Immune to pothole damage |
+| **Cargo Rack** | $400 | Carry 2 orders simultaneously |
+| **Headlight Array** | $200 | Better night visibility, -10% accident chance |
+| **Anti-Theft Lock** | $350 | Bike can't be stolen during pickups |
+
+### 🎒 EQUIPMENT UPGRADES
+| Upgrade | Cost | Effect |
+|---------|------|--------|
+| **Insulated Bag** | $250 | Food stays hot 50% longer |
+| **Phone Mount** | $100 | -15% battery drain from GPS |
+| **Portable Charger** | $200 | +50% battery capacity |
+| **Body Armor** | $400 | Survive one accident per shift |
+| **Rain Gear** | $150 | No speed penalty in rain |
+| **Backup Phone** | $600 | Second chance if battery dies |
+
+### 🧠 SKILL UPGRADES
+| Upgrade | Cost | Effect |
+|---------|------|--------|
+| **Customer Whisperer** | $300 | Unlock "Apologize" button (restores 0.2 stars, once per shift) |
+| **Traffic Reader** | $250 | See traffic patterns on map |
+| **Shortcut Knowledge** | $200 | Unlock hidden alley routes |
+| **Tip Sense** | $350 | See tip amount before accepting order |
+| **Iron Bladder** | $150 | -50% energy drain from bathroom breaks |
+| **Algorithm Sympathizer** | $500 | +10% acceptance rate tolerance |
+
+### 🏠 BASE UPGRADES (Persistent)
+| Upgrade | Cost | Effect |
+|---------|------|--------|
+| **Better Apartment** | $1000 | Start each shift with +20% energy |
+| **Meal Prep** | $400 | Free food once per shift (restores 30% energy) |
+| **Therapy Sessions** | $600 | Stress meter drains 30% slower |
+| **Side Hustle** | $800 | Earn $20/hour passively between shifts |
+
+---
+
+## 5. GAMEPLAY MECHANICS (Detailed)
+
+### Order Selection Phase
+- Orders appear as **cards** with:
+  - Restaurant name & distance
+  - Customer distance & neighborhood type
+  - Estimated tip (hidden until upgraded)
+  - **Risk indicators** (⚠️ = known difficult customer)
+  - Time limit
+
+- **Acceptance Rate** drops if you decline too many orders
+- **Surge pricing** events tempt you with 2x pay but 3x stress
+
+### Navigation Phase
+- **Top-down or isometric view**
+- Swipe/tap to steer
+- **Hazard types:**
+  - 🚗 Cars (random door opens, sudden brakes)
+  - 🚶 Pedestrians (jump out randomly)
+  - 🐕 Dogs (chase you, steal food)
+  - 🕳️ Potholes (damage bike, spill food)
+  - 🌧️ Weather (rain = slippery, snow = slow)
+  - 🚧 Construction (forced detours)
+
+- **Mini-events:**
+  - Red lights (wait = time lost, run = risk)
+  - One-way streets (wrong way = cop attention)
+  - Hills (energy drain)
+  - Stairs (if delivering to apartment)
+
+### Delivery Phase
+- **Customer interaction options:**
+  - Knock politely (safe)
+  - Call phone (uses battery)
+  - Text (slow, but low stress)
+  - Leave at door (risk of theft complaint)
+
+- **Customer archetypes:**
+  - 😊 **The Gratful**: Auto 5-star, good tip
+  - 😤 **The Impatient**: Timer is shorter, tips less
+  - 🤓 **The Perfectionist**: Inspects food, complains easily
+  - 🍺 **The Drunk**: High tip, but unpredictable
+  - 👻 **The Ghost**: Doesn't answer door, you wait
+  - 🤖 **The Bot**: Automated complaints, no tip
+
+### Rating Calculation
+```
+Base Rating: 5.0
+- Late delivery: -0.5 to -2.0
+- Cold food: -0.5 to -1.5
+- Damaged food: -1.0 to -3.0
+- Rude interaction: -1.0
+- Customer mood modifier: ±0.5
++ Apology bonus: +0.2 (if upgraded)
++ Perfect delivery: +0.1 (caps at 5.0)
+
+Final Rating = Clamped 0.0 - 5.0
+```
+
+---
+
+## 6. RANDOM EVENTS (The Algorithm's Wrath)
+
+### "Surge" Events
+- **"PEAK PAY!"**: 2x earnings, 2x order volume, 3x stress
+- **"RAIN BONUS!"**: +$2 per delivery, but slippery roads
+- **"ALGORITHM APPRECIATION DAY"**: Random +0.3 rating bonus (rare)
+
+### "Penalty" Events
+- **"AUDIT"**: Algorithm randomly checks your stats. Any stat below threshold = -0.5 rating
+- **"CUSTOMER COMPLAINT WAVE"**: Multiple customers complain simultaneously
+- **"APP UPDATE"**: Controls change mid-shift (adds confusion)
+- **"GPS OUTAGE"**: Navigation disabled for 2 minutes
+
+### "Opportunity" Events
+- **"CASH TIP"**: Customer tips in cash (untaxed, instant)
+- **"STREET FESTIVAL"**: Bonus orders, but crowded streets
+- **"FELLOW COURIER"**: Another courier gives you a shortcut tip
+- **"CHARGING STATION"**: Free phone charge if you stop
+
+---
+
+## 7. VISUAL & AUDIO DESIGN
+
+### Art Style
+- **Pixel art** with modern lighting effects
+- **Neon-drenched city** at night, soft pastels during day
+- **UI looks like a phone app** (diegetic interface)
+- **Deactivation Logbook** styled as a worn notebook with coffee stains
+
+### Sound Design
+- **Lo-fi hip hop** during calm moments
+- **Tense electronic** during rush periods
+- **Phone notification sounds** = dopamine hits
+- **"DEACTIVATED"** = harsh buzzer + screen crack effect
+
+### Music
+- Dynamic soundtrack that shifts with stress level
+- Each neighborhood has its own ambient track
+- "Deactivation" screen plays a sad, slow piano version of the main theme
+
+---
+
+## 8. PROGRESSION & REPLAYABILITY
+
+### Run Structure
+- **Each run = 1 shift (12 hours / ~15-20 min real time)**
+- Death = Deactivation = Logbook entry
+- **Persistent currency**: "Saved Tips" (a fraction of earnings)
+- **Meta-upgrades** make future runs easier but never trivial
+
+### Difficulty Scaling
+- **Shift 1-10**: Learning phase, forgiving algorithm
+- **Shift 11-30**: Algorithm gets stricter, more hazards
+- **Shift 31-50**: "Veteran Courier" status, rare order types
+- **Shift 51+**: "Legendary Courier" mode, algorithm actively hunts you
+
+### Endgame
+- **"Perfect Shift"**: Complete 12 hours with 5.0 rating (extremely hard)
+- **"Unionize"**: Secret ending where you organize couriers and fight the algorithm
+- **"Deactivation #1000"**: Special logbook entry, unlocks "Ghost Courier" skin
+
+---
+
+## 9. NARRATIVE LAYERS (Optional Depth)
+
+### The Algorithm Speaks
+Between shifts, you receive **messages from "The Algorithm"**:
+- Passive-aggressive motivational quotes
+- Fake appreciation ("You're a valued partner!")
+- Threats disguised as policy updates
+
+### Courier Community
+- **NPC couriers** you meet at pickup spots
+- Share tips, complain together, form rivalries
+- **"Courier Chat"** shows other players' deactivations (darkly funny)
+
+### The Deactivation Logbook
+- Each entry has **pixel art illustration**
+- **"Cause of Deactivation"** + **"Algorithm's Note"**
+- Collecting all entries = **"Encyclopedia of Exploitation"** achievement
+
+---
+
+## 10. SAMPLE DEACTIVATION SCREEN
+
+```
+╔══════════════════════════════════════════════════════════════╗
+║                     ⚠️ DEACTIVATED ⚠️                        ║
+║                                                              ║
+║   Your account has been deactivated.                         ║
+║                                                              ║
+║   Reason: #047                                               ║
+║   "Milkshake melted. Customer called it 'soup.'"             ║
+║                                                              ║
+║   ┌────────────────────────────────────────────────────┐    ║
+║   │  [pixel art: sad courier holding melted shake]     │    ║
+║   └────────────────────────────────────────────────────┘    ║
+║                                                              ║
+║   Shift Earnings: $47.23                                     ║
+║   Saved Tips (kept): $4.72                                   ║
+║   Final Rating: 3.2 ⭐                                       ║
+║                                                              ║
+║   [ LOG TO LOGBOOK ]          [ RETURN TO SHOP ]             ║
+║                                                              ║
+║   "You were a valued partner. We wish you the best in your   ║
+║    future endeavors." — The Algorithm                        ║
+╚══════════════════════════════════════════════════════════════╝
+```
+
+---
+
+## 11. UNIQUE SELLING POINTS
+
+1. **Darkly comedic take on gig economy** - Satirical but not preachy
+2. **Rogue-lite with meaningful progression** - Every death teaches you something
+3. **Deactivation Logbook** - Collectible failures are the reward
+4. **Diegetic UI** - The game looks like a phone app
+5. **Short runs, high replayability** - "One more shift" addictiveness
+6. **Authentic details** - Written by someone who's been there
+
+---
+
+## 12. TITLE OPTIONS
+
+- **Don't Get Deactivated!**
+- **Rated: 4.2 Stars**
+- **The Algorithm Will See You Now**
+- **Independent Contractor**
+- **Surge Pricing**
+- **Deactivation Notice**
+
+---
+
+## 13. TAGLINE OPTIONS
+
+- *"You're not an employee. You're a line item."*
+- *"5 stars or you're fired."*
+- *"The customer is always right. The algorithm is always watching."*
+- *"Deliver or be deleted."*
+- *"Your rating is your life."*
+
+---
+
+## 14. NEXT STEPS
+
+1. **Prototype the core loop** (order → navigate → deliver → rate)
+2. **Build the Deactivation Logbook** (start with 20 entries)
+3. **Implement 5 meta-upgrades** for initial testing
+4. **Playtest for "one more run" feel**
+5. **Add narrative layer** (Algorithm messages)
+6. **Polish UI to look like a real delivery app**
+
+---
+
+This game has **huge potential** as a commentary on modern work, wrapped in addictive rogue-lite mechanics. The key is balancing **fun frustration** (haha I got deactivated because of a cat) with **meaningful progression** (I'm getting better, learning the system).
+
+Want me to expand on any specific section? Maybe write out **50 more Deactivation Logbook entries** or design the **upgrade tree visual**?

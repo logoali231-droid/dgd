@@ -1,0 +1,50 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: var(--bg-main);
+    color: var(--text-white);
+    font-family: var(--font-pixel);
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Container principal simulando a tela de um smartphone */
+#game-container {
+    width: 100%;
+    max-width: 420px;
+    height: 100vh;
+    max-height: 840px;
+    background-color: var(--bg-container);
+    border: 4px solid var(--text-muted);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* HUD fixado no topo da tela */
+#hud {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 12px;
+    background-color: rgba(0, 0, 0, 0.4);
+    border-bottom: 2px solid var(--text-muted);
+}
+
+/* Área de jogo preenchendo o restante do espaço vertical */
+#game-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 24px;
+    padding: 20px;
+    text-align: center;
+}
