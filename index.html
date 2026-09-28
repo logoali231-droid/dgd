@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Don't Get Deactivated!</title>
+    
+    <!-- This connects your CSS file -->
+    <link rel="stylesheet" href="styles/variables.css">
+    <link rel="stylesheet" href="styles/layout.css">
+    <link rel="stylesheet" href="styles/components.css">
+    
+    <!-- This imports the pixel font -->
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- THE MAIN GAME CONTAINER -->
+    <div id="game-container">
+
+        <!-- THE HUD (Stat Bars) -->
+        <div id="hud">
+            <div class="stat-box">
+                <span class="label">Rating:</span>
+                <span id="ui-rating">5.0</span>
+            </div>
+            <div class="stat-box">
+                <span class="label">Energy:</span>
+                <span id="ui-energy">100%</span>
+            </div>
+            <div class="stat-box">
+                <span class="label">Battery:</span>
+                <span id="ui-battery">100%</span>
+            </div>
+            <div class="stat-box">
+                <span class="label">Cash:</span>
+                <span id="ui-cash">$0.00</span>
+            </div>
+            <div class="stat-box">
+                <span class="label">Shift:</span>
+                <span id="ui-time">12:00:00</span>
+            </div>
+        </div>
+
+        <!-- THE GAME AREA (Where the action happens) -->
+        <div id="game-area">
+            <h1 id="game-state-text">Click to Start Shift</h1>
+            <button id="start-btn">Start Shift</button>
+        </div>
+
+    </div>
+
+    <!-- This connects your JavaScript file. 
+         It goes at the bottom so the HTML loads first! -->
+    <script type="module" src="main.js"></script>
+
+</body>
+</html>
