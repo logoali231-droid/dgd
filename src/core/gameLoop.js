@@ -6,7 +6,9 @@ import { updateOrderManager } from '../systems/OrderManager.js';
 import { updateDialogueSystem } from '../systems/DialogueSystem.js';
 import { checkDeactivationConditions, rollRandomDeactivation } from '../systems/DeactivationSystem.js';
 import { updatePositions, recordShiftComplete } from '../systems/PositionTracker.js';
-import { showStart } from '../ui/ScreenManager.js';
+import { getMaxEnergy, getMaxBattery, getUpgradeEffect } from '../systems/UpgradeSystem.js';
+import { showShiftComplete } from '../ui/ScreenManager.js';
+import { renderShiftComplete } from '../ui/ShiftCompleteUI.js';
 
 let lastTimestamp = 0;
 let animationId = null;
@@ -31,10 +33,16 @@ function tick(timestamp) {
     state.shiftElapsedRealSeconds += deltaTime;
     state.shiftTimeRemaining -= deltaTime * CONFIG.TIME_SCALE;
 
-    state.energy -= CONFIG.BASE_ENERGY_DRAIN * deltaTime;
-    state.energy = clamp(state.energy, 0, 100);
-    state.battery -= CONFIG.BASE_BATTERY_DRAIN * deltaTime;
-    state.battery = clamp(state.battery, 0, 100);
+    // ---- Upgrade-aware drain ----
+    const maxEnergy = getMaxEnergy();
+    const maxBattery = getMaxBattery();
+    const energyDrainMult = 1 - getUpgradeEffect("energyDrainReduction");
+    const batteryDrainMult = 1 - getUpgradeEffect("batteryDrainReduction");
+
+    state.energy -= CONFIG.BASE_ENERGY_DRAIN * energyDrainMult * deltaTime;
+    state.energy = clamp(state.energy, 0, maxEnergy);
+    state.battery -= CONFIG.BASE_BATTERY_DRAIN * batteryDrainMult * deltaTime;
+    state.battery = clamp(state.battery, 0, maxBattery);
 
     updateHUD();
     updateOrderManager(deltaTime);
@@ -50,10 +58,12 @@ function tick(timestamp) {
     }
 
     if (state.shiftTimeRemaining <= 0) {
-        recordShiftComplete();
-        stopGameLoop();
-        return;
-    }
+    recordShiftComplete();
+    stopGameLoop();
+    renderShiftComplete();
+    showShiftComplete();
+    return;
+}
 
     animationId = requestAnimationFrame(tick);
 }

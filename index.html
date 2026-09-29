@@ -4,13 +4,9 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Don't Get Deactivated!</title>
-
-    <!-- CSS -->
     <link rel="stylesheet" href="styles/variables.css" />
     <link rel="stylesheet" href="styles/layout.css" />
     <link rel="stylesheet" href="styles/components.css" />
-
-    <!-- Pixel font -->
     <link
       href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"
       rel="stylesheet"
@@ -18,69 +14,105 @@
   </head>
   <body>
     <div id="game-container">
-      <!-- ============ HUD ============ -->
       <div id="hud">
         <div class="stat-box">
-          <span class="label">Rating:</span>
-          <span id="ui-rating">5.0</span>
+          <span class="label">Rating:</span><span id="ui-rating">5.0</span>
         </div>
         <div class="stat-box">
-          <span class="label">Energy:</span>
-          <span id="ui-energy">100%</span>
+          <span class="label">Energy:</span><span id="ui-energy">100%</span>
         </div>
         <div class="stat-box">
-          <span class="label">Battery:</span>
-          <span id="ui-battery">100%</span>
+          <span class="label">Battery:</span><span id="ui-battery">100%</span>
         </div>
         <div class="stat-box">
-          <span class="label">Cash:</span>
-          <span id="ui-cash">$0.00</span>
+          <span class="label">Cash:</span><span id="ui-cash">$0.00</span>
         </div>
         <div class="stat-box">
-          <span class="label">Shift:</span>
-          <span id="ui-time">12:00:00</span>
+          <span class="label">Shift:</span><span id="ui-time">12:00:00</span>
+        </div>
+        <div class="stat-box">
+          <span class="label">Streak:</span><span id="ui-streak">0</span>
         </div>
       </div>
+      <div id="positions-bar"></div>
 
-      <!-- ============ GAME AREA ============ -->
       <div id="game-area">
-        <!-- SCREEN: START -->
+        <!-- START -->
         <div id="screen-start" class="screen">
           <h1 id="game-state-text">Click to Start Shift</h1>
           <button id="start-btn">Start Shift</button>
         </div>
 
-        <!-- SCREEN: GAME (hidden by default) -->
+        <!-- GAME -->
         <div id="screen-game" class="screen hidden">
           <p id="game-status-text">Waiting for orders...</p>
+
+          <div id="consumable-bar">
+            <button id="use-coffee-btn" class="consumable-btn">
+              ☕ Coffee <span id="coffee-count">x0</span>
+            </button>
+            <button id="use-powerbank-btn" class="consumable-btn">
+              🔋 Power Bank <span id="powerbank-count">x0</span>
+            </button>
+          </div>
+
           <div id="order-card" class="hidden">
             <p id="order-food">🍕 Pizza</p>
             <p id="order-restaurant">Restaurant Name</p>
-            <p id="order-customer">Customer Location</p>
+            <p id="order-distance">🏠 Close · Downtown</p>
+            <p id="order-customer">Customer #1234</p>
             <p id="order-pay">$0.00</p>
           </div>
           <div id="order-actions" class="hidden">
             <button id="accept-btn">Accept</button>
             <button id="decline-btn">Decline</button>
           </div>
+
           <div id="delivery-panel" class="hidden">
             <p id="delivery-food">🍕 Pizza</p>
             <p id="delivery-timer">30s</p>
-            <button id="deliver-btn">Deliver!</button>
+            <div id="delivery-actions">
+              <button id="deliver-btn">Deliver!</button>
+              <button id="boost-btn">🚀 Boost</button>
+            </div>
           </div>
 
           <div id="dialogue-box" class="hidden">
             <p id="dialogue-text">...</p>
             <div id="dialogue-choices"></div>
-        </div>
+          </div>
         </div>
 
-        <!-- SCREEN: DEACTIVATED (hidden by default) -->
+        <!-- SHOP -->
+        <div id="screen-shop" class="screen hidden">
+          <h1>SHOP</h1>
+          <p id="shop-tips-display">Saved Tips: $0</p>
+          <div id="shop-list"></div>
+          <button id="shop-continue-btn">Continue</button>
+        </div>
+
+        <!-- SHIFT COMPLETE SCREEN -->
+        <div id="screen-shift-complete" class="screen hidden">
+          <h1 id="shift-complete-title">SHIFT COMPLETE</h1>
+          <div id="shift-complete-stats">
+            <p>Deliveries: <span id="sc-deliveries">0</span></p>
+            <p>Cash Earned: <span id="sc-cash">$0.00</span></p>
+            <p>Final Rating: <span id="sc-rating">5.0</span></p>
+            <p>Shifts Survived: <span id="sc-streak">0</span></p>
+          </div>
+          <div id="shift-complete-positions"></div>
+          <div id="shift-complete-actions">
+            <button id="next-shift-btn">Next Shift</button>
+            <button id="shift-shop-btn">Shop</button>
+          </div>
+        </div>
+
+        <!-- DEACTIVATED -->
         <div id="screen-deactivated" class="screen hidden">
           <h1 id="deactivated-title">DEACTIVATED</h1>
           <p id="deactivated-reason">Reason: #000</p>
           <p id="deactivated-text">Placeholder reason text...</p>
-          <button id="restart-btn">Try Again</button>
+          <button id="restart-btn">Go to Shop</button>
         </div>
       </div>
     </div>

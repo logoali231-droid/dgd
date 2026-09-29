@@ -1,38 +1,30 @@
+const startScreen         = document.getElementById('screen-start');
+const gameScreen          = document.getElementById('screen-game');
+const shopScreen          = document.getElementById('screen-shop');
+const shiftCompleteScreen = document.getElementById('screen-shift-complete');
+const deactivatedScreen   = document.getElementById('screen-deactivated');
 
-
-const startScreen = document.getElementById('screen-start');
-const deactivatedScreen = document.getElementById('screen-deactivated');
-const restartBtn = document.getElementById('restart-btn');
+const restartBtn          = document.getElementById('restart-btn');
 const deactivatedReasonEl = document.getElementById("deactivated-reason");
-const deactivatedTextEl = document.getElementById("deactivated-text");
-const gameScreen = document.getElementById("screen-game");
+const deactivatedTextEl   = document.getElementById("deactivated-text");
 
-const screens = [startScreen, gameScreen, deactivatedScreen];
+const screens = [startScreen, gameScreen, shopScreen, shiftCompleteScreen, deactivatedScreen];
+
 function showScreen(target) {
-    for (let i = 0; i < screens.length; i++) {
-        screens[i].classList.add("hidden")
-    }
+    for (const s of screens) s.classList.add("hidden");
 
-    if (target === "start")
-        startScreen.classList.remove("hidden")
-    else if (target === "deactivated") {   
-        deactivatedScreen.classList.remove("hidden")
-    // future: else if target === "game": gameScreen.classList.remove("hidden")
-} else if (target === "game") {
-    gameScreen.classList.remove("hidden");
-}
-}
-export function showStart() {
-    showScreen("start");
+    if (target === "start")            startScreen.classList.remove("hidden");
+    else if (target === "game")        gameScreen.classList.remove("hidden");
+    else if (target === "shop")        shopScreen.classList.remove("hidden");
+    else if (target === "shiftComplete") shiftCompleteScreen.classList.remove("hidden");
+    else if (target === "deactivated") deactivatedScreen.classList.remove("hidden");
 }
 
-export function showDeactivated() {
-    showScreen("deactivated");
-}
-
-export function showGame() {
-    showScreen("game");   // Does nothing visible yet — no game screen exists
-}
+export function showStart()         { showScreen("start"); }
+export function showGame()          { showScreen("game"); }
+export function showShop()          { showScreen("shop"); }
+export function showShiftComplete() { showScreen("shiftComplete"); }
+export function showDeactivated()   { showScreen("deactivated"); }
 
 export function triggerDeactivation(reason) {
     deactivatedReasonEl.textContent = `Reason: ${reason.id}`;

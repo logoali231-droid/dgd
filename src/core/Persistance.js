@@ -3,6 +3,8 @@ import { CONFIG } from '../data/config.js';
 const defaultSave = {
     savedTips: 0,
     ownedUpgrades: [],
+    coffeeCount: 0,
+    powerBankCount: 0,
     logbookEntries: [],
     totalShiftsSurvived: 0,
     bestRating: 5.0,

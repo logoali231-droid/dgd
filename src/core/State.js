@@ -14,7 +14,7 @@ export const state = {
     cash: CONFIG.DEFAULT_CASH,
     shiftTimeRemaining: CONFIG.DEFAULT_SHIFT_TIME,
 
-    // Per-shift counters (reset each shift)
+    // Per-shift counters
     deliveriesThisShift: 0,
     shiftElapsedRealSeconds: 0,
     currentDelivery: null,
@@ -22,7 +22,16 @@ export const state = {
     randomRollTimer: 2.0,
     currentShiftWasPerfect: true,
 
-    // Streak layer — persists across shifts but resets on deactivation
+    // Consumables — once per shift
+    shiftCoffeeUsed: false,
+    shiftPowerBankUsed: false,
+
+    // Boost — once per delivery
+    boostActive: false,
+    boostTimeLeft: 0,
+    boostUsedThisDelivery: false,
+
+    // Streak layer
     streakStats: {
         deliveries: 0,
         perfectShifts: 0,
@@ -34,14 +43,16 @@ export const state = {
         care: 0,
         efficiency: 0
     },
-    earnedPositions: [],      // Currently-active bonuses this run
-    shiftsSurvived: 0,        // Total successful shifts in this streak
+    earnedPositions: [],
+    shiftsSurvived: 0,
 
     // Permanent meta layer
     discoveredPositions: save.discoveredPositions || [],
     logbookEntries: save.logbookEntries,
     savedTips: save.savedTips,
     ownedUpgrades: save.ownedUpgrades,
+    coffeeCount: save.coffeeCount || 0,
+    powerBankCount: save.powerBankCount || 0,
     totalShiftsSurvived: save.totalShiftsSurvived,
     bestRating: save.bestRating,
     survivalMap: { ...defaultSurvival, ...(save.survivalMap || {}) }
@@ -51,6 +62,8 @@ export function saveMeta() {
     Persistence.save({
         savedTips: state.savedTips,
         ownedUpgrades: state.ownedUpgrades,
+        coffeeCount: state.coffeeCount,
+        powerBankCount: state.powerBankCount,
         logbookEntries: state.logbookEntries,
         totalShiftsSurvived: state.totalShiftsSurvived,
         bestRating: state.bestRating,
@@ -59,7 +72,6 @@ export function saveMeta() {
     });
 }
 
-// Called when a deactivation occurs — wipes the streak
 export function resetStreak() {
     state.streakStats = {
         deliveries: 0,
@@ -76,26 +88,35 @@ export function resetStreak() {
     state.shiftsSurvived = 0;
 }
 
-// Called when starting a fresh shift
 export function resetShiftCounters() {
     state.deliveriesThisShift = 0;
     state.shiftElapsedRealSeconds = 0;
     state.currentDelivery = null;
     state.currentShiftWasPerfect = true;
+    state.shiftCoffeeUsed = false;
+    state.shiftPowerBankUsed = false;
+    state.boostActive = false;
+    state.boostTimeLeft = 0;
+    state.boostUsedThisDelivery = false;
 }
 
-export function resetRun() {
-    state.rating = CONFIG.DEFAULT_RATING;
-    state.energy = CONFIG.DEFAULT_ENERGY;
-    state.battery = CONFIG.DEFAULT_BATTERY;
-    state.cash = CONFIG.DEFAULT_CASH;
-    state.shiftTimeRemaining = CONFIG.DEFAULT_SHIFT_TIME;
-
+/**
+ * Called between shifts in a streak.
+ * Resets run-stats but KEEPS cash, streak stats, earned positions.
+ */
+export function resetShiftForStreak() {
+    const maxEnergy = 100; // gets overridden by resetRun if upgrades exist
+    state.rating = 5.0;
+    // Note: energy/battery/shift time get set by resetRun in UpgradeSystem
     state.deliveriesThisShift = 0;
     state.shiftElapsedRealSeconds = 0;
     state.currentDelivery = null;
     state.lastDelivery = null;
     state.currentShiftWasPerfect = true;
     state.randomRollTimer = 2.0;
-    state.isPlaying = false;
+    state.shiftCoffeeUsed = false;
+    state.shiftPowerBankUsed = false;
+    state.boostActive = false;
+    state.boostTimeLeft = 0;
+    state.boostUsedThisDelivery = false;
 }
