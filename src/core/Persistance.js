@@ -8,7 +8,7 @@ const defaultSave = {
     bestRating: 5.0
 };
 
-export const Persistence = {
+export const Persistance = {
     load() {
         try {
             const raw = localStorage.getItem(CONFIG.SAVE_KEY);

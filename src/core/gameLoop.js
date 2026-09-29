@@ -1,6 +1,7 @@
 import { state } from './State.js';
 import { CONFIG } from '../data/config.js';
 import { clamp } from '../utils/math.js';
+import { updateHUD } from '../ui/HUD.js';
 
 let lastTimestamp = 0;
 let animationId = null;
@@ -29,7 +30,7 @@ function tick(timestamp) {
     state.battery = clamp(state.battery, 0, 100);
 
     state.shiftTimeRemaining -= deltaTime;
-
+    updateHUD();
     if (state.energy <= 0 || state.battery <= 0 || state.shiftTimeRemaining <= 0) {
         console.log("DEACTIVATED");
         stopGameLoop();

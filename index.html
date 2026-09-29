@@ -5,20 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Don't Get Deactivated!</title>
     
-    <!-- This connects your CSS file -->
+    <!-- CSS -->
     <link rel="stylesheet" href="styles/variables.css">
     <link rel="stylesheet" href="styles/layout.css">
     <link rel="stylesheet" href="styles/components.css">
     
-    <!-- This imports the pixel font -->
+    <!-- Pixel font -->
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 </head>
 <body>
 
-    <!-- THE MAIN GAME CONTAINER -->
     <div id="game-container">
 
-        <!-- THE HUD (Stat Bars) -->
+        <!-- ============ HUD ============ -->
         <div id="hud">
             <div class="stat-box">
                 <span class="label">Rating:</span>
@@ -42,17 +41,27 @@
             </div>
         </div>
 
-        <!-- THE GAME AREA (Where the action happens) -->
+        <!-- ============ GAME AREA ============ -->
         <div id="game-area">
-            <h1 id="game-state-text">Click to Start Shift</h1>
-            <button id="start-btn">Start Shift</button>
+
+            <!-- SCREEN: START -->
+            <div id="screen-start" class="screen">
+                <h1 id="game-state-text">Click to Start Shift</h1>
+                <button id="start-btn">Start Shift</button>
+            </div>
+
+            <!-- SCREEN: DEACTIVATED (hidden by default) -->
+            <div id="screen-deactivated" class="screen hidden">
+                <h1 id="deactivated-title">DEACTIVATED</h1>
+                <p id="deactivated-reason">Reason: #000</p>
+                <p id="deactivated-text">Placeholder reason text...</p>
+                <button id="restart-btn">Try Again</button>
+            </div>
+
         </div>
 
     </div>
 
-    <!-- This connects your JavaScript file. 
-         It goes at the bottom so the HTML loads first! -->
     <script type="module" src="main.js"></script>
-
 </body>
 </html>
