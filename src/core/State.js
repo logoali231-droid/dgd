@@ -83,3 +83,19 @@ export function resetShiftCounters() {
     state.currentDelivery = null;
     state.currentShiftWasPerfect = true;
 }
+
+export function resetRun() {
+    state.rating = CONFIG.DEFAULT_RATING;
+    state.energy = CONFIG.DEFAULT_ENERGY;
+    state.battery = CONFIG.DEFAULT_BATTERY;
+    state.cash = CONFIG.DEFAULT_CASH;
+    state.shiftTimeRemaining = CONFIG.DEFAULT_SHIFT_TIME;
+
+    state.deliveriesThisShift = 0;
+    state.shiftElapsedRealSeconds = 0;
+    state.currentDelivery = null;
+    state.lastDelivery = null;
+    state.currentShiftWasPerfect = true;
+    state.randomRollTimer = 2.0;
+    state.isPlaying = false;
+}

@@ -1,4 +1,3 @@
-import { state, saveMeta } from "../core/State.js";
 import {
   getActiveCondition,
   rollRandomEvent,

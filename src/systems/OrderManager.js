@@ -1,6 +1,6 @@
 import { state } from "../core/State.js";
 import { randomInt, formatCurrency, clamp } from "../utils/math.js";
-import { getRandomFood } from "../data/foods.js";
+import { getRandomFood } from "../data/food.js";
 import { updatePositions, getActiveEffect } from "./PositionTracker.js";
 
 // ---- DOM ELEMENTS ----
