@@ -1,15 +1,22 @@
-// 1. Imports
-import { startGameLoop } from './src/core/gameLoop.js';
-import { state } from './src/core/State.js';
+import { startGameLoop } from './src/core/GameLoop.js';
+import { state, resetShiftCounters } from './src/core/State.js';
+import { showGame, showStart } from './src/ui/ScreenManager.js';
+import { resetOrderManager } from './src/systems/OrderManager.js';
+import { resetDialogueSystem } from './src/systems/DialogueSystem.js';
 
-// 2. Debug helper
 window.state = state;
 
-// 3. Grab button
 const startButton = document.getElementById("start-btn");
+const restartBtn  = document.getElementById("restart-btn");
 
-// 4. Attach listener
 startButton.addEventListener("click", () => {
-    startButton.disabled = true;
+    resetShiftCounters();
+    showGame();
     startGameLoop();
+});
+
+restartBtn.addEventListener("click", () => {
+    resetOrderManager();
+    resetDialogueSystem();
+    showStart();
 });

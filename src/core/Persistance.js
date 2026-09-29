@@ -5,10 +5,12 @@ const defaultSave = {
     ownedUpgrades: [],
     logbookEntries: [],
     totalShiftsSurvived: 0,
-    bestRating: 5.0
+    bestRating: 5.0,
+    survivalMap: {},
+    discoveredPositions: []
 };
 
-export const Persistance = {
+export const Persistence = {
     load() {
         try {
             const raw = localStorage.getItem(CONFIG.SAVE_KEY);
@@ -19,11 +21,9 @@ export const Persistance = {
             return { ...defaultSave };
         }
     },
-
     save(data) {
         localStorage.setItem(CONFIG.SAVE_KEY, JSON.stringify(data));
     },
-
     reset() {
         localStorage.removeItem(CONFIG.SAVE_KEY);
     }
