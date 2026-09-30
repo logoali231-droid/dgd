@@ -1,13 +1,4 @@
-/**
- * Food types with their own behavior.
- *
- * coldTime     — Real seconds until the food starts losing rating value.
- *                Shorter = riskier delivery.
- * payMultiplier — Higher for riskier foods. Ice cream pays more because
- *                 it's terrifying to deliver.
- *
- * Emojis are placeholders — later these get replaced with pixel art sprites.
- */
+
 export const FOODS = [
   {
     id: "icecream",
