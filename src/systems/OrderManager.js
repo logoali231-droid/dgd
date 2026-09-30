@@ -1,8 +1,10 @@
 import { state } from "../core/State.js";
 import { randomInt, formatCurrency, clamp } from "../utils/math.js";
-import { getRandomFood } from "../data/foods.js";
+import { getRandomFood } from "../data/food.js";
 import { getRandomNeighborhood } from "../data/neighborhoods.js";
 import { updatePositions, getActiveEffect } from "./PositionTracker.js";
+import { SFX } from './AudioManager.js';
+import { updateHazardSystem, resetHazards } from './HazardSystem.js';
 
 // ---- DOM ELEMENTS ----
 const orderCard       = document.getElementById("order-card");
@@ -60,6 +62,7 @@ function generateOrder() {
 function spawnOrder() {
     if (currentOrder !== null) return;
     if (state.currentDelivery !== null) return;
+    resetHazards();
 
     currentOrder = generateOrder();
     orderTimeLeft = ORDER_DECISION_TIME;
@@ -71,7 +74,7 @@ function spawnOrder() {
     customerEl.textContent = currentOrder.customerName;
     payEl.textContent = formatCurrency(currentOrder.payAmount);
     statusTextEl.textContent = "NEW ORDER — Decide now!";
-
+    SFX.orderDing();
     actionsEl.classList.remove("hidden");
     orderCard.classList.remove("hidden");
 }
@@ -136,6 +139,7 @@ function handleAccept() {
         timeLeft: currentOrder.food.coldTime,
         totalTime: currentOrder.food.coldTime
     };
+    resetHazards();
 
     // Fresh boost charge for this delivery
     state.boostActive = false;
@@ -188,6 +192,7 @@ function handleDeliver() {
 
     // Apply to state
     state.cash += earned;
+    SFX.cashRegister();
     state.rating = clamp(state.rating + ratingDelta, 0, 5);
     state.deliveriesThisShift += 1;
     state.streakStats.deliveries += 1;
@@ -215,6 +220,7 @@ function handleBoost() {
     state.boostActive = true;
     state.boostTimeLeft = BOOST_DURATION;
     state.boostUsedThisDelivery = true;
+    SFX.bikeBell();
     updateBoostButton();
 }
 
@@ -240,7 +246,7 @@ export function updateOrderManager(deltaTime) {
         // Drain delivery timer — slower if boosting
         const drainRate = state.boostActive ? (1 / BOOST_SPEED) : 1.0;
         state.currentDelivery.timeLeft -= deltaTime * drainRate;
-
+        updateHazardSystem(deltaTime);
         updateDeliveryUI();
         return;
     }
@@ -274,4 +280,5 @@ export function resetOrderManager() {
     actionsEl.classList.add("hidden");
     orderCard.classList.add("hidden");
     deliveryPanel.classList.add("hidden");
+    resetHazards();
 }

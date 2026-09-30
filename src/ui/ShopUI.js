@@ -2,7 +2,7 @@ import { state } from '../core/State.js';
 import { UPGRADES, TIER_LABELS } from '../data/upgrades.js';
 import { CONSUMABLES } from '../data/consumables.js';
 import { purchaseUpgrade, hasUpgrade } from '../systems/UpgradeSystem.js';
-import { buyConsumable } from '../systems/ConsumableSystem.js';
+import { buyConsumable } from '../systems/ConsumablesSystem.js';
 import { formatCurrency } from '../utils/math.js';
 
 const tipsDisplay = document.getElementById("shop-tips-display");

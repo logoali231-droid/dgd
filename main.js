@@ -5,11 +5,21 @@ import { resetOrderManager } from './src/systems/OrderManager.js';
 import { resetDialogueSystem } from './src/systems/DialogueSystem.js';
 import { resetRun, startNextShift } from './src/systems/UpgradeSystem.js';
 import { renderShop } from './src/ui/ShopUI.js';
-import { useCoffee, usePowerBank } from './src/systems/ConsumableSystem.js';
+import { useCoffee, usePowerBank } from './src/systems/ConsumablesSystem.js';
 import { snapshotPositions } from './src/ui/ShiftCompleteUI.js';
+import { showLogbook } from './src/ui/ScreenManager.js';
+import { renderLogbook } from './src/ui/LogbookUI.js';
+import { unlockAudio, SFX } from './src/systems/AudioManager.js';
+import { preloadSprites, ASSETS } from './src/assets.js';
 
 window.state = state;
-
+// Preload common sprites in the background (missing ones just resolve to null)
+preloadSprites([
+    ASSETS.sprites.items.pizza_box,
+    ASSETS.sprites.items.coffee_cup,
+    ASSETS.sprites.items.generic_bag,
+    ASSETS.sprites.characters.player_bike_pedaling
+]);
 const startButton     = document.getElementById("start-btn");
 const restartBtn      = document.getElementById("restart-btn");
 const shopContinueBtn = document.getElementById("shop-continue-btn");
@@ -50,6 +60,7 @@ usePowerBankBtn.addEventListener("click", () => {
 
 // ---- Start a fresh streak ----
 startButton.addEventListener("click", () => {
+    unlockAudio();
     resetRun();
     resetShiftCounters();
     snapshotPositions();
@@ -86,4 +97,17 @@ shopContinueBtn.addEventListener("click", () => {
     showStart();
 });
 
+const logbookBtn     = document.getElementById("logbook-btn");
+const logbookBackBtn = document.getElementById("logbook-back-btn");
+
+logbookBtn.addEventListener("click", () => {
+    renderLogbook();
+    showLogbook();
+});
+
+logbookBackBtn.addEventListener("click", () => {
+    showStart();
+});
+
 refreshConsumableBar();
+

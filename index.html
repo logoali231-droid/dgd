@@ -41,6 +41,7 @@
         <div id="screen-start" class="screen">
           <h1 id="game-state-text">Click to Start Shift</h1>
           <button id="start-btn">Start Shift</button>
+          <button id="logbook-btn">📖 Logbook</button>
         </div>
 
         <!-- GAME -->
@@ -71,6 +72,13 @@
           <div id="delivery-panel" class="hidden">
             <p id="delivery-food">🍕 Pizza</p>
             <p id="delivery-timer">30s</p>
+
+            <button id="hazard-btn" class="hidden">
+              <span id="hazard-icon">🕳️</span>
+              <span id="hazard-name">Pothole</span>
+              <span id="hazard-timer">2.0s</span>
+            </button>
+
             <div id="delivery-actions">
               <button id="deliver-btn">Deliver!</button>
               <button id="boost-btn">🚀 Boost</button>
@@ -105,6 +113,14 @@
             <button id="next-shift-btn">Next Shift</button>
             <button id="shift-shop-btn">Shop</button>
           </div>
+        </div>
+
+        <!-- LOGBOOK SCREEN -->
+        <div id="screen-logbook" class="screen hidden">
+          <h1>📖 DEACTIVATION LOGBOOK</h1>
+          <p id="logbook-progress">0 / 0 collected (0%)</p>
+          <div id="logbook-list"></div>
+          <button id="logbook-back-btn">Back</button>
         </div>
 
         <!-- DEACTIVATED -->

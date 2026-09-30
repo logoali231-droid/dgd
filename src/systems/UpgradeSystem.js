@@ -1,8 +1,6 @@
-import { state, saveMeta } from '../core/State.js';
 import { CONFIG } from '../data/config.js';
 import { UPGRADES, getUpgradeById } from '../data/upgrades.js';
-import { state, resetShiftForStreak } from '../core/State.js';  // add resetShiftForStreak
-
+import { state, saveMeta, resetShiftForStreak } from '../core/State.js';
 /**
  * Start a new shift WITHIN a streak. Keeps cash, streak, positions.
  * Resets energy/battery/time to max, respects upgrades.

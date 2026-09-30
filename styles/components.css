@@ -584,3 +584,223 @@
     transform: translateY(4px);
     box-shadow: none;
 }
+
+/* ============ START ACTIONS (two buttons) ============ */
+#start-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+    max-width: 240px;
+}
+
+#logbook-btn {
+    font-family: var(--font-pixel);
+    font-size: 10px;
+    background-color: #444;
+    color: var(--text-white);
+    border: 3px solid #ffffff;
+    padding: 14px 20px;
+    cursor: pointer;
+    box-shadow: 0 4px 0 #222;
+}
+
+#logbook-btn:active {
+    transform: translateY(4px);
+    box-shadow: none;
+}
+
+/* ============ LOGBOOK SCREEN ============ */
+#screen-logbook h1 {
+    font-size: 12px;
+    color: var(--lime-green);
+}
+
+#logbook-progress {
+    font-size: 9px;
+    color: #ffcc00;
+}
+
+#logbook-list {
+    width: 100%;
+    max-height: 420px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 4px;
+}
+
+.logbook-category {
+    font-size: 9px;
+    color: #ffcc00;
+    margin-top: 12px;
+    margin-bottom: 2px;
+    letter-spacing: 1px;
+    text-align: left;
+    text-transform: uppercase;
+}
+
+.logbook-entry {
+    background-color: var(--bg-box);
+    border: 2px solid var(--text-muted);
+    padding: 10px;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.logbook-entry.unlocked {
+    border-color: var(--lime-green);
+}
+
+.logbook-entry.locked {
+    opacity: 0.5;
+}
+
+.logbook-entry-id {
+    font-size: 8px;
+    color: var(--text-muted);
+}
+
+.logbook-entry.unlocked .logbook-entry-id {
+    color: var(--lime-green);
+}
+
+.logbook-entry-text {
+    font-size: 8px;
+    color: var(--text-white);
+    line-height: 1.6;
+}
+
+.logbook-entry.locked .logbook-entry-text {
+    color: #555;
+    letter-spacing: 2px;
+}
+
+.logbook-survival {
+    font-size: 8px;
+    color: #ff8844;
+}
+
+.logbook-survival.full {
+    color: var(--lime-green);
+}
+
+.logbook-survival-bar {
+    width: 100%;
+    height: 6px;
+    background-color: #111;
+    border: 1px solid var(--text-muted);
+    margin-top: 2px;
+}
+
+.logbook-survival-fill {
+    height: 100%;
+    background-color: #ff8844;
+    transition: width 0.2s;
+}
+
+.logbook-survival-fill.full {
+    background-color: var(--lime-green);
+}
+
+#logbook-back-btn {
+    font-family: var(--font-pixel);
+    font-size: 12px;
+    background-color: var(--lime-green);
+    color: var(--bg-main);
+    border: 3px solid #ffffff;
+    padding: 14px 24px;
+    cursor: pointer;
+    box-shadow: 0 4px 0 #1b8a00;
+}
+
+#logbook-back-btn:active {
+    transform: translateY(4px);
+    box-shadow: none;
+}
+
+/* ============ HUD SPRITE ICONS ============ */
+.hud-icon {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    vertical-align: middle;
+    margin-right: 4px;
+    image-rendering: pixelated;
+}
+
+.hud-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+/* ============ ORDER CARD FOOD SPRITE ============ */
+.order-food-sprite {
+    width: 32px;
+    height: 32px;
+    image-rendering: pixelated;
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 8px;
+}
+
+/* ============ HAZARD BUTTON ============ */
+#hazard-btn {
+    font-family: var(--font-pixel);
+    background-color: #3a1a1a;
+    border: 4px solid #ff4444;
+    color: #ffffff;
+    padding: 12px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+#hazard-btn.hidden {
+    display: none;
+}
+
+#hazard-icon {
+    font-size: 36px;
+    line-height: 1;
+}
+
+#hazard-name {
+    font-size: 9px;
+    color: #ff8888;
+    letter-spacing: 1px;
+}
+
+#hazard-timer {
+    font-size: 11px;
+    color: #ffcc00;
+}
+
+/* Pulse animation while the hazard is active */
+#hazard-btn.pulsing {
+    animation: hazardPulse 0.4s ease-in-out infinite alternate;
+}
+
+@keyframes hazardPulse {
+    from {
+        border-color: #ff4444;
+        box-shadow: 0 0 0 0 #ff444488;
+    }
+    to {
+        border-color: #ff8888;
+        box-shadow: 0 0 12px 4px #ff444466;
+    }
+}
+
+#hazard-btn:active {
+    transform: scale(0.97);
+}
