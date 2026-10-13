@@ -14,6 +14,8 @@ export const state = {
   cash: CONFIG.DEFAULT_CASH,
   shiftTimeRemaining: CONFIG.DEFAULT_SHIFT_TIME,
 
+  currentPhase: null,  // Phase object, updated each frame
+
   // Per-shift counters
   deliveriesThisShift: 0,
   shiftElapsedRealSeconds: 0,
@@ -110,6 +112,7 @@ export function resetShiftCounters() {
   state.pedalStallTime = 0;
   state.redLightStrikes = 0;
   state.currentHazardPending = null;
+  state.currentPhase = null;
 }
 
 /**

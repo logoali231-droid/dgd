@@ -109,5 +109,12 @@ logbookBackBtn.addEventListener("click", () => {
     showStart();
 });
 
+const shopStartBtn = document.getElementById("shop-start-btn");
+
+shopStartBtn.addEventListener("click", () => {
+    renderShop();
+    showShop();
+});
+
 refreshConsumableBar();
 

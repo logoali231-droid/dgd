@@ -5,6 +5,7 @@ import { getActiveEffect } from './PositionTracker.js';
 import { clamp } from '../utils/math.js';
 import { SFX } from './AudioManager.js';
 import { addBikeWear, WEAR_PER_HIT } from './OrderManager.js';
+import { getHazardScaling } from '../data/difficultyScaling.js';
 
 // ---- DOM ----
 const hazardBanner  = document.getElementById("hazard-banner");
@@ -33,8 +34,13 @@ const RED_LIGHT_MAX_STRIKES = 3;
 function getSpawnChance() {
     const upgradeReduction = getUpgradeEffect("hazardChanceReduction");
     const positionMult = getActiveEffect("hazardChanceMultiplier");
+    const streakMult = getHazardScaling(state.shiftsSurvived);
+    const phaseMult = state.currentPhase ? state.currentPhase.hazardMultiplier : 1.0;
+
     let chance = BASE_SPAWN_CHANCE * (1 - upgradeReduction);
     if (positionMult !== null) chance *= positionMult;
+    chance *= streakMult;
+    chance *= phaseMult;
     return Math.min(chance, 1.0);
 }
 

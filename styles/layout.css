@@ -37,14 +37,41 @@ body {
     border-bottom: 2px solid var(--text-muted);
 }
 
-/* Área de jogo preenchendo o restante do espaço vertical */
 #game-area {
     flex: 1;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
     gap: 24px;
     padding: 20px;
     text-align: center;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    min-height: 0;
+}
+
+/* Screens center themselves when short, scroll the outer area when tall */
+.screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+    width: 100%;
+    text-align: center;
+    margin: auto 0;
+}
+
+.screen.hidden {
+    display: none;
+}
+
+/* Exception: shop and logbook fill the height and manage their own scroll */
+#screen-shop,
+#screen-logbook {
+    margin: 0;
+    height: 100%;
+    justify-content: flex-start;
 }
