@@ -14,6 +14,7 @@ import {
   getDecisionTimeScaling,
   getPayScaling,
 } from "../data/difficultyScaling.js";
+import { getRandomCustomerType } from "../data/customerTypes.js";
 
 // ---- DOM ----
 const orderCard = document.getElementById("order-card");
@@ -26,6 +27,8 @@ const actionsEl = document.getElementById("order-actions");
 const acceptBtn = document.getElementById("accept-btn");
 const declineBtn = document.getElementById("decline-btn");
 const statusTextEl = document.getElementById("game-status-text");
+const customerTypeEl = document.getElementById("order-customer-type");
+const customerTaglineEl = document.getElementById("order-customer-tagline");
 
 const deliveryPanel = document.getElementById("delivery-panel");
 const deliveryFoodEl = document.getElementById("delivery-food");
@@ -70,12 +73,7 @@ function generateOrder() {
   const restaurant = RESTAURANTS[randomInt(0, RESTAURANTS.length - 1)];
   const neighborhood = getRandomNeighborhood();
   const customerName = `Customer #${randomInt(1000, 9999)}`;
-  const basePay = randomInt(5, 18);
-  const streakPay = getPayScaling(state.shiftsSurvived);
-  const phasePay = state.currentPhase ? state.currentPhase.payMultiplier : 1.0;
-  const payAmount = Math.round(
-    basePay * food.payMultiplier * neighborhood.payMult * streakPay * phasePay,
-  );
+  const customerType = getRandomCustomerType();
 
   let food;
   do {
@@ -83,7 +81,26 @@ function generateOrder() {
   } while (food.id === lastFoodId);
   lastFoodId = food.id;
 
-  return { restaurant, neighborhood, customerName, food, payAmount };
+  const basePay = randomInt(5, 18);
+  const streakPay = getPayScaling(state.shiftsSurvived);
+  const phasePay = state.currentPhase ? state.currentPhase.payMultiplier : 1.0;
+  const payAmount = Math.round(
+    basePay *
+      food.payMultiplier *
+      neighborhood.payMult *
+      streakPay *
+      phasePay *
+      customerType.payMult,
+  );
+
+  return {
+    restaurant,
+    neighborhood,
+    customerName,
+    customerType,
+    food,
+    payAmount,
+  };
 }
 
 function spawnOrder() {
@@ -102,6 +119,8 @@ function spawnOrder() {
   distanceEl.textContent = `${currentOrder.neighborhood.distanceLabel} · ${currentOrder.neighborhood.name}`;
   distanceEl.className = `distance-${currentOrder.neighborhood.distance}`;
   customerEl.textContent = currentOrder.customerName;
+  customerTypeEl.textContent = `${currentOrder.customerType.emoji} ${currentOrder.customerType.name}`;
+  customerTaglineEl.textContent = currentOrder.customerType.tagline;
   payEl.textContent = formatCurrency(currentOrder.payAmount);
   statusTextEl.textContent = "NEW ORDER — Decide now!";
   SFX.orderDing();
@@ -199,7 +218,9 @@ function handleAccept() {
     neighborhood: currentOrder.neighborhood,
     customerName: currentOrder.customerName,
     payAmount: currentOrder.payAmount,
-    timeLeft: currentOrder.food.coldTime,
+    timeLeft: Math.round(
+      currentOrder.food.coldTime * currentOrder.customerType.coldTimeMult,
+    ),
     totalTime: currentOrder.food.coldTime,
     progress: 0,
     distance: currentOrder.neighborhood.progress,
@@ -234,20 +255,54 @@ function handleDeliver() {
   if (!d) return;
   if (d.progress < d.distance) return;
 
+  const archetype = d.customerType || {
+    id: "polite",
+    emoji: "🙂",
+    name: "The Polite",
+    payMult: 1.0,
+    coldTimeMult: 1.0,
+    ratingOnTime: 0.1,
+    ratingLate: -0.5,
+    bonusTipChance: 0,
+    bonusTipMult: 1.0,
+    complaintChance: 0,
+  };
+
   let earned, ratingDelta, message;
 
   if (d.timeLeft > 0) {
     earned = d.payAmount;
-    ratingDelta = 0.1;
-    message = "On time! Customer is happy.";
+    ratingDelta = archetype.ratingOnTime;
+    message = "On time!";
   } else {
     const lateness = -d.timeLeft;
     const payFactor = Math.max(0.2, 1 - lateness / 30);
     earned = Math.round(d.payAmount * payFactor);
-    ratingDelta = -0.5;
-    message = `Late by ${Math.round(lateness)}s. Food went cold.`;
+    ratingDelta = archetype.ratingLate;
+    message = `Late by ${Math.round(lateness)}s.`;
   }
 
+  // ---- Bonus tip roll ----
+  let bonusTip = 0;
+  if (
+    archetype.bonusTipChance > 0 &&
+    Math.random() < archetype.bonusTipChance
+  ) {
+    bonusTip = Math.round(d.payAmount * archetype.bonusTipMult);
+    earned += bonusTip;
+  }
+
+  // ---- Complaint roll ----
+  let complaint = false;
+  if (
+    archetype.complaintChance > 0 &&
+    Math.random() < archetype.complaintChance
+  ) {
+    complaint = true;
+    ratingDelta -= 0.3;
+  }
+
+  // ---- Position effects (unchanged) ----
   const cashMult = getActiveEffect("cashMultiplier");
   if (cashMult !== null) earned = Math.round(earned * cashMult);
 
@@ -259,6 +314,7 @@ function handleDeliver() {
     ratingDelta = ratingDelta * (1 - ratingLossReduction);
   }
 
+  // ---- Apply to state ----
   state.cash += earned;
   SFX.cashRegister();
   state.rating = clamp(state.rating + ratingDelta, 0, 5);
@@ -266,9 +322,14 @@ function handleDeliver() {
   state.streakStats.deliveries += 1;
   if (ratingDelta < 0) state.currentShiftWasPerfect = false;
 
+  // ---- Build status message ----
   const ratingText =
     ratingDelta >= 0 ? `+${ratingDelta.toFixed(1)}` : ratingDelta.toFixed(1);
-  statusTextEl.textContent = `${message} Earned $${earned}. Rating ${ratingText}`;
+  let msgParts = [`${message}`, `Earned $${earned}`];
+  if (bonusTip > 0) msgParts.push(`(+$${bonusTip} tip!)`);
+  if (complaint) msgParts.push("⚠ Complaint!");
+  msgParts.push(`Rating ${ratingText}`);
+  statusTextEl.textContent = msgParts.join(" · ");
 
   updatePositions();
 

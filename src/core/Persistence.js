@@ -9,7 +9,9 @@ const defaultSave = {
     totalShiftsSurvived: 0,
     bestRating: 5.0,
     survivalMap: {},
-    discoveredPositions: []
+    discoveredPositions: [],
+    settings: { soundOn: true, vibrationOn: true },
+    lastDeathReason: null
 };
 
 export const Persistence = {

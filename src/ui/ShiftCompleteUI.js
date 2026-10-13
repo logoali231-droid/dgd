@@ -1,6 +1,7 @@
 import { state } from '../core/State.js';
 import { getPositionById } from '../data/hiddenPositions.js';
 import { formatCurrency } from '../utils/math.js';
+import { renderShiftAlgorithmMessage } from './AlgorithmUI.js';
 
 const deliveriesEl = document.getElementById("sc-deliveries");
 const cashEl       = document.getElementById("sc-cash");
@@ -43,4 +44,5 @@ export function renderShiftComplete() {
             positionsEl.appendChild(p);
         }
     }
+    renderShiftAlgorithmMessage();
 }

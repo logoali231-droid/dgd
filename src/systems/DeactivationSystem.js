@@ -6,6 +6,7 @@ import {
 } from "../data/deathReasons.js";
 import { triggerDeactivation } from "../ui/ScreenManager.js";
 import { SFX, MUSIC } from "./AudioManager.js";
+import { shakeScreen } from '../utils/screenShake.js';
 
 const conditionCooldowns = {};
 
@@ -77,10 +78,11 @@ function applyDeactivation(reason) {
 
   // Track best rating
   if (state.rating > state.bestRating) state.bestRating = state.rating;
-
+  state.lastDeathReason = reason.id;
   saveMeta();
   SFX.deactivationBuzz();
   MUSIC.gameOver();
+  shakeScreen(3, 400);
   triggerDeactivation(reason);
   resetStreak();
 }

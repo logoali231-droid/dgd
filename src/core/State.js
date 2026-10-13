@@ -14,7 +14,14 @@ export const state = {
   cash: CONFIG.DEFAULT_CASH,
   shiftTimeRemaining: CONFIG.DEFAULT_SHIFT_TIME,
 
-  currentPhase: null,  // Phase object, updated each frame
+  currentPhase: null, // Phase object, updated each frame
+
+  settings: {
+    soundOn: save.settings?.soundOn ?? true,
+    vibrationOn: save.settings?.vibrationOn ?? true,
+  },
+
+  lastDeathReason: save.lastDeathReason || null,
 
   // Per-shift counters
   deliveriesThisShift: 0,
@@ -78,6 +85,8 @@ export function saveMeta() {
     bestRating: state.bestRating,
     survivalMap: state.survivalMap,
     discoveredPositions: state.discoveredPositions,
+    settings: state.settings,
+    lastDeathReason: state.lastDeathReason,
   });
 }
 

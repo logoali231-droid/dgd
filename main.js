@@ -1,6 +1,6 @@
 import { startGameLoop } from './src/core/GameLoop.js';
 import { state, resetShiftCounters } from './src/core/State.js';
-import { showGame, showStart, showShop } from './src/ui/ScreenManager.js';
+import { showGame, showStart, showShop, showConfig } from './src/ui/ScreenManager.js';
 import { resetOrderManager } from './src/systems/OrderManager.js';
 import { resetDialogueSystem } from './src/systems/DialogueSystem.js';
 import { resetRun, startNextShift } from './src/systems/UpgradeSystem.js';
@@ -11,26 +11,41 @@ import { showLogbook } from './src/ui/ScreenManager.js';
 import { renderLogbook } from './src/ui/LogbookUI.js';
 import { unlockAudio, SFX } from './src/systems/AudioManager.js';
 import { preloadSprites, ASSETS } from './src/assets.js';
+import { renderCareerHub } from './src/ui/CareerHubUI.js';
+import { renderConfig, bindConfigListeners } from './src/ui/ConfigUI.js';
 
 window.state = state;
-// Preload common sprites in the background (missing ones just resolve to null)
+
 preloadSprites([
     ASSETS.sprites.items.pizza_box,
     ASSETS.sprites.items.coffee_cup,
     ASSETS.sprites.items.generic_bag,
     ASSETS.sprites.characters.player_bike_pedaling
 ]);
-const startButton     = document.getElementById("start-btn");
-const restartBtn      = document.getElementById("restart-btn");
-const shopContinueBtn = document.getElementById("shop-continue-btn");
-const nextShiftBtn    = document.getElementById("next-shift-btn");
-const shiftShopBtn    = document.getElementById("shift-shop-btn");
 
-const useCoffeeBtn    = document.getElementById("use-coffee-btn");
-const usePowerBankBtn = document.getElementById("use-powerbank-btn");
-const coffeeCountEl   = document.getElementById("coffee-count");
+// ---- DOM ----
+const startButton      = document.getElementById("start-btn");
+const restartBtn       = document.getElementById("restart-btn");
+const shopContinueBtn  = document.getElementById("shop-continue-btn");
+const nextShiftBtn     = document.getElementById("next-shift-btn");
+const shiftShopBtn     = document.getElementById("shift-shop-btn");
+const useCoffeeBtn     = document.getElementById("use-coffee-btn");
+const usePowerBankBtn  = document.getElementById("use-powerbank-btn");
+const coffeeCountEl    = document.getElementById("coffee-count");
 const powerBankCountEl = document.getElementById("powerbank-count");
+const logbookBtn       = document.getElementById("logbook-btn");
+const logbookBackBtn   = document.getElementById("logbook-back-btn");
+const shopStartBtn     = document.getElementById("shop-start-btn");
+const configBtn        = document.getElementById("config-btn");
+const configBackBtn    = document.getElementById("config-back-btn");
 
+// ---- HUB HELPER ----
+function goToHub() {
+    renderCareerHub();
+    showStart();
+}
+
+// ---- CONSUMABLES ----
 export function refreshConsumableBar() {
     const coffeeDisabled = state.shiftCoffeeUsed || state.coffeeCount <= 0;
     const bankDisabled   = state.shiftPowerBankUsed || state.powerBankCount <= 0;
@@ -53,12 +68,11 @@ export function refreshConsumableBar() {
 useCoffeeBtn.addEventListener("click", () => {
     if (useCoffee().ok) refreshConsumableBar();
 });
-
 usePowerBankBtn.addEventListener("click", () => {
     if (usePowerBank().ok) refreshConsumableBar();
 });
 
-// ---- Start a fresh streak ----
+// ---- START SHIFT ----
 startButton.addEventListener("click", () => {
     unlockAudio();
     resetRun();
@@ -69,7 +83,7 @@ startButton.addEventListener("click", () => {
     startGameLoop();
 });
 
-// ---- Next shift within a streak ----
+// ---- NEXT SHIFT ----
 nextShiftBtn.addEventListener("click", () => {
     startNextShift();
     resetShiftCounters();
@@ -78,13 +92,12 @@ nextShiftBtn.addEventListener("click", () => {
     startGameLoop();
 });
 
-// ---- Shop from Shift Complete (streak preserved) ----
-shiftShopBtn.addEventListener("click", () => {
-    renderShop();
-    showShop();
-});
+// ---- SHOP NAV ----
+shopStartBtn.addEventListener("click", () => { renderShop(); showShop(); });
+shiftShopBtn.addEventListener("click", () => { renderShop(); showShop(); });
+shopContinueBtn.addEventListener("click", goToHub);
 
-// ---- After death → shop ----
+// ---- DEATH → SHOP ----
 restartBtn.addEventListener("click", () => {
     resetOrderManager();
     resetDialogueSystem();
@@ -92,29 +105,17 @@ restartBtn.addEventListener("click", () => {
     showShop();
 });
 
-// ---- From shop → back to start (fresh streak) ----
-shopContinueBtn.addEventListener("click", () => {
-    showStart();
-});
+// ---- LOGBOOK ----
+logbookBtn.addEventListener("click", () => { renderLogbook(); showLogbook(); });
+logbookBackBtn.addEventListener("click", goToHub);
 
-const logbookBtn     = document.getElementById("logbook-btn");
-const logbookBackBtn = document.getElementById("logbook-back-btn");
+// ---- CONFIG ----
+configBtn.addEventListener("click", () => { renderConfig(); showConfig(); });
+configBackBtn.addEventListener("click", goToHub);
 
-logbookBtn.addEventListener("click", () => {
-    renderLogbook();
-    showLogbook();
-});
+// Bind config listeners once, at boot
+bindConfigListeners();
 
-logbookBackBtn.addEventListener("click", () => {
-    showStart();
-});
-
-const shopStartBtn = document.getElementById("shop-start-btn");
-
-shopStartBtn.addEventListener("click", () => {
-    renderShop();
-    showShop();
-});
-
+// ---- INITIAL RENDER ----
 refreshConsumableBar();
-
+goToHub();
