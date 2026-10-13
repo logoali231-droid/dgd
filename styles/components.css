@@ -748,21 +748,205 @@
     margin-right: 8px;
 }
 
-/* ============ HAZARD BUTTON ============ */
-#hazard-btn {
-    font-family: var(--font-pixel);
+/* ============ DELIVERY PANEL — v2 ============ */
+#progress-bar {
+    width: 100%;
+    height: 16px;
+    background-color: #111;
+    border: 3px solid var(--text-muted);
+    overflow: hidden;
+}
+
+#progress-fill {
+    width: 0%;
+    height: 100%;
+    background-color: var(--lime-green);
+    transition: width 0.1s linear;
+}
+
+#progress-text {
+    font-size: 9px;
+    color: var(--lime-green);
+    letter-spacing: 1px;
+}
+
+/* Endurance bar — thinner, orange */
+#endurance-bar {
+    width: 100%;
+    height: 8px;
+    background-color: #111;
+    border: 2px solid #553;
+    overflow: hidden;
+}
+
+#endurance-fill {
+    width: 100%;
+    height: 100%;
+    background-color: #ffaa00;
+    transition: width 0.1s linear;
+}
+
+#endurance-fill.depleted {
+    background-color: #ff4444;
+}
+
+#endurance-text {
+    font-size: 8px;
+    color: #ffaa00;
+    letter-spacing: 1px;
+}
+
+/* ============ HAZARD BANNER ============ */
+#hazard-banner {
+    width: 100%;
     background-color: #3a1a1a;
     border: 4px solid #ff4444;
-    color: #ffffff;
     padding: 12px;
-    width: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 4px;
+    animation: hazardPulse 0.35s ease-in-out infinite alternate;
+}
+
+#hazard-banner.hidden { display: none; }
+
+#hazard-banner #hazard-icon {
+    font-size: 40px;
+    line-height: 1;
+}
+
+#hazard-banner #hazard-name {
+    font-size: 10px;
+    color: #ff8888;
+    letter-spacing: 1px;
+}
+
+#hazard-banner #hazard-timer {
+    font-size: 12px;
+    color: #ffcc00;
+}
+
+#hazard-banner #hazard-hint {
+    font-size: 10px;
+    color: #ffffff;
+    background-color: #ff4444;
+    padding: 4px 10px;
+    letter-spacing: 2px;
+    margin-top: 4px;
+}
+
+@keyframes hazardPulse {
+    from { border-color: #ff4444; box-shadow: 0 0 0 0 #ff444488; }
+    to   { border-color: #ff8888; box-shadow: 0 0 14px 4px #ff444466; }
+}
+
+/* ============ STRIKE BANNER (RED LIGHT) ============ */
+#strike-banner {
+    width: 100%;
+    background-color: #4a0000;
+    border: 4px solid #ff2222;
+    padding: 10px;
+    font-size: 12px;
+    color: #ffffff;
+    letter-spacing: 2px;
+    text-align: center;
+    animation: hazardPulse 0.35s ease-in-out infinite alternate;
+}
+
+#strike-banner.hidden { display: none; }
+
+/* ============ PEDAL BUTTON (big, hold-to-use) ============ */
+#pedal-btn {
+    width: 100%;
+    font-family: var(--font-pixel);
+    font-size: 14px;
+    background-color: #ffaa00;
+    color: #1a1a1a;
+    border: 4px solid #ffffff;
+    padding: 20px 12px;
     cursor: pointer;
-    user-select: none;
+    box-shadow: 0 5px 0 #a86e00;
     -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    touch-action: manipulation;
+    letter-spacing: 1px;
+}
+
+#pedal-btn.pedaling {
+    background-color: #ffdd44;
+    box-shadow: 0 5px 0 #ffaa00;
+}
+
+#pedal-btn:disabled,
+#pedal-btn.stalled {
+    background-color: #333;
+    color: #666;
+    box-shadow: 0 5px 0 #111;
+    cursor: not-allowed;
+}
+
+/* Deliver + Boost side by side */
+#delivery-actions {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+}
+
+#deliver-btn {
+    flex: 1;
+    font-family: var(--font-pixel);
+    font-size: 11px;
+    background-color: var(--lime-green);
+    color: var(--bg-main);
+    border: 3px solid #ffffff;
+    padding: 14px 12px;
+    cursor: pointer;
+    box-shadow: 0 4px 0 #1b8a00;
+}
+
+#deliver-btn:disabled {
+    background-color: #333;
+    color: #666;
+    box-shadow: 0 4px 0 #111;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+#boost-btn {
+    flex: 1;
+    font-family: var(--font-pixel);
+    font-size: 10px;
+    background-color: #00a8ff;
+    color: #ffffff;
+    border: 3px solid #ffffff;
+    padding: 14px 12px;
+    cursor: pointer;
+    box-shadow: 0 4px 0 #005f99;
+}
+
+#boost-btn:active:not(:disabled) {
+    transform: translateY(4px);
+    box-shadow: none;
+}
+
+#boost-btn.boost-active {
+    background-color: #00e5ff;
+    color: #000;
+    box-shadow: 0 4px 0 #008899;
+}
+
+#boost-btn.boost-used {
+    background-color: #444;
+    color: #888;
+    border-color: #666;
+    box-shadow: none;
+    cursor: not-allowed;
+}
+
+#delivery-timer.boosting {
+    color: #00e5ff;
+    text-shadow: 0 0 10px #00e5ff, 0 0 20px #00e5ff;
 }
 
 #hazard-btn.hidden {

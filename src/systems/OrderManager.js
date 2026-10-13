@@ -3,10 +3,10 @@ import { randomInt, formatCurrency, clamp } from "../utils/math.js";
 import { getRandomFood } from "../data/food.js";
 import { getRandomNeighborhood } from "../data/neighborhoods.js";
 import { updatePositions, getActiveEffect } from "./PositionTracker.js";
-import { SFX } from './AudioManager.js';
-import { updateHazardSystem, resetHazards } from './HazardSystem.js';
+import { SFX } from "./AudioManager.js";
+import { updateHazardSystem, resetHazards, notifyPedalReleased, notifyPedalHeld } from "./HazardSystem.js";
 
-// ---- DOM ELEMENTS ----
+// ---- DOM ----
 const orderCard       = document.getElementById("order-card");
 const restaurantEl    = document.getElementById("order-restaurant");
 const distanceEl      = document.getElementById("order-distance");
@@ -21,19 +21,29 @@ const statusTextEl    = document.getElementById("game-status-text");
 const deliveryPanel   = document.getElementById("delivery-panel");
 const deliveryFoodEl  = document.getElementById("delivery-food");
 const deliveryTimerEl = document.getElementById("delivery-timer");
+const pedalBtn        = document.getElementById("pedal-btn");
 const deliverBtn      = document.getElementById("deliver-btn");
 const boostBtn        = document.getElementById("boost-btn");
+const progressFill    = document.getElementById("progress-fill");
+const progressText    = document.getElementById("progress-text");
+const enduranceFill   = document.getElementById("endurance-fill");
+const enduranceText   = document.getElementById("endurance-text");
 
 // ---- CONFIG ----
 const ORDER_DECISION_TIME = 6;
-const BOOST_DURATION      = 5.0;      // real seconds
-const BOOST_SPEED         = 1.5;      // timer drains at 1/1.5 rate
+const BOOST_DURATION      = 5.0;
+const BASE_PEDAL_RATE     = 40;     // progress units per second
+const ENDURANCE_DRAIN     = 18;     // per second while holding
+const ENDURANCE_RECOVER   = 30;     // per second while released
+const STALL_PENALTY       = 2.0;    // seconds pedal disabled after overexertion
+const WEAR_PER_HIT        = 0.08;   // 8% pedal rate lost per hazard hit
 
 // ---- ORDER STATE ----
 let currentOrder = null;
 let orderTimeLeft = 0;
 let nextOrderIn = 3;
 let lastFoodId = null;
+let bikeWear = 0;  // 0.0 = fresh bike, each hazard hit adds 0.08
 
 // ---- RESTAURANTS ----
 const RESTAURANTS = [
@@ -41,7 +51,6 @@ const RESTAURANTS = [
     "Pizza Prime", "Curry Corner", "Donut Diner", "Ramen Rush"
 ];
 
-// ---- GENERATE ORDER ----
 function generateOrder() {
     const restaurant   = RESTAURANTS[randomInt(0, RESTAURANTS.length - 1)];
     const neighborhood = getRandomNeighborhood();
@@ -51,14 +60,12 @@ function generateOrder() {
     do { food = getRandomFood(); } while (food.id === lastFoodId);
     lastFoodId = food.id;
 
-    // Pay scales with food risk AND distance
     const basePay = randomInt(5, 18);
     const payAmount = Math.round(basePay * food.payMultiplier * neighborhood.payMult);
 
     return { restaurant, neighborhood, customerName, food, payAmount };
 }
 
-// ---- SHOW ORDER ----
 function spawnOrder() {
     if (currentOrder !== null) return;
     if (state.currentDelivery !== null) return;
@@ -79,12 +86,28 @@ function spawnOrder() {
     orderCard.classList.remove("hidden");
 }
 
-// ---- HIDE ORDER ----
 function dismissOrder() {
     currentOrder = null;
     orderTimeLeft = 0;
     actionsEl.classList.add("hidden");
     orderCard.classList.add("hidden");
+}
+
+// ---- PEDAL STATE ----
+function setPedalHeld(held) {
+    const d = state.currentDelivery;
+    if (!d) return;
+    if (state.pedalStallTime > 0) return;  // stalled
+    if (!held && state.pedalEndurance <= 0) return; // can't restart empty
+    if (held && d.progress >= d.distance) return;   // already done
+
+    if (held === state.pedalHeld) return;  // no change
+
+    state.pedalHeld = held;
+    pedalBtn.classList.toggle("pedaling", held);
+
+    if (held) notifyPedalHeld();
+    else      notifyPedalReleased();
 }
 
 // ---- DELIVERY UI ----
@@ -104,6 +127,22 @@ function updateDeliveryUI() {
         deliveryTimerEl.classList.remove("boosting");
         deliveryTimerEl.classList.add("cold");
     }
+
+    const pct = Math.min((d.progress / d.distance) * 100, 100);
+    progressFill.style.width = `${pct}%`;
+    progressText.textContent = `${Math.min(Math.round(d.progress), d.distance)} / ${d.distance}`;
+
+    enduranceFill.style.width = `${state.pedalEndurance}%`;
+    enduranceFill.classList.toggle("depleted", state.pedalEndurance <= 0);
+    enduranceText.textContent = state.pedalStallTime > 0
+        ? `STALLED — ${state.pedalStallTime.toFixed(1)}s`
+        : `Endurance ${Math.round(state.pedalEndurance)}%`;
+
+    deliverBtn.disabled = d.progress < d.distance;
+
+    // Pedal button visual state
+    pedalBtn.classList.toggle("stalled", state.pedalStallTime > 0);
+    pedalBtn.disabled = state.pedalStallTime > 0;
 
     updateBoostButton();
 }
@@ -137,21 +176,27 @@ function handleAccept() {
         customerName: currentOrder.customerName,
         payAmount: currentOrder.payAmount,
         timeLeft: currentOrder.food.coldTime,
-        totalTime: currentOrder.food.coldTime
+        totalTime: currentOrder.food.coldTime,
+        progress: 0,
+        distance: currentOrder.neighborhood.progress
     };
-    resetHazards();
 
-    // Fresh boost charge for this delivery
+    state.pedalHeld = false;
+    state.pedalEndurance = 100;
+    state.pedalStallTime = 0;
     state.boostActive = false;
     state.boostTimeLeft = 0;
     state.boostUsedThisDelivery = false;
 
+    resetHazards();
     dismissOrder();
 
     deliveryFoodEl.textContent = `${state.currentDelivery.food.emoji} ${state.currentDelivery.food.name}`;
     deliveryPanel.classList.remove("hidden");
+    pedalBtn.textContent = "🚴 HOLD TO PEDAL";
+    pedalBtn.classList.remove("pedaling", "stalled");
     updateDeliveryUI();
-    statusTextEl.textContent = "Delivering...";
+    statusTextEl.textContent = "Hold PEDAL. Release to brake for hazards.";
 }
 
 function handleDecline() {
@@ -163,6 +208,7 @@ function handleDecline() {
 function handleDeliver() {
     const d = state.currentDelivery;
     if (!d) return;
+    if (d.progress < d.distance) return;
 
     let earned, ratingDelta, message;
 
@@ -178,7 +224,6 @@ function handleDeliver() {
         message = `Late by ${Math.round(lateness)}s. Food went cold.`;
     }
 
-    // Apply position effects
     const cashMult = getActiveEffect("cashMultiplier");
     if (cashMult !== null) earned = Math.round(earned * cashMult);
 
@@ -190,7 +235,6 @@ function handleDeliver() {
         ratingDelta = ratingDelta * (1 - ratingLossReduction);
     }
 
-    // Apply to state
     state.cash += earned;
     SFX.cashRegister();
     state.rating = clamp(state.rating + ratingDelta, 0, 5);
@@ -203,12 +247,13 @@ function handleDeliver() {
 
     updatePositions();
 
-    // Clear delivery + boost
     state.currentDelivery = null;
+    state.pedalHeld = false;
     state.boostActive = false;
     state.boostTimeLeft = 0;
     state.boostUsedThisDelivery = false;
     deliveryPanel.classList.add("hidden");
+    resetHazards();
     nextOrderIn = 3;
 }
 
@@ -224,7 +269,37 @@ function handleBoost() {
     updateBoostButton();
 }
 
-// ---- WIRE UP BUTTONS ----
+// ---- PEDAL LISTENERS (mouse + touch + keyboard) ----
+function pedalDown(e) {
+    if (e) e.preventDefault();
+    setPedalHeld(true);
+}
+function pedalUp(e) {
+    if (e) e.preventDefault();
+    setPedalHeld(false);
+}
+
+pedalBtn.addEventListener("mousedown", pedalDown);
+pedalBtn.addEventListener("mouseup", pedalUp);
+pedalBtn.addEventListener("mouseleave", pedalUp);
+pedalBtn.addEventListener("touchstart", pedalDown, { passive: false });
+pedalBtn.addEventListener("touchend", pedalUp, { passive: false });
+pedalBtn.addEventListener("touchcancel", pedalUp, { passive: false });
+
+// Spacebar accessibility — hold space to pedal
+window.addEventListener("keydown", (e) => {
+    if (e.code === "Space" && state.currentDelivery && !state.pedalStallTime) {
+        e.preventDefault();
+        setPedalHeld(true);
+    }
+});
+window.addEventListener("keyup", (e) => {
+    if (e.code === "Space") {
+        e.preventDefault();
+        setPedalHeld(false);
+    }
+});
+
 acceptBtn.addEventListener("click", handleAccept);
 declineBtn.addEventListener("click", handleDecline);
 deliverBtn.addEventListener("click", handleDeliver);
@@ -234,7 +309,18 @@ boostBtn.addEventListener("click", handleBoost);
 export function updateOrderManager(deltaTime) {
     // ---- ACTIVE DELIVERY ----
     if (state.currentDelivery) {
-        // Tick the boost timer (real seconds)
+        const d = state.currentDelivery;
+
+        // Stall timer
+        if (state.pedalStallTime > 0) {
+            state.pedalStallTime -= deltaTime;
+            if (state.pedalStallTime <= 0) {
+                state.pedalStallTime = 0;
+                state.pedalEndurance = 40; // recover a bit on stall end
+            }
+        }
+
+        // Boost timer
         if (state.boostActive) {
             state.boostTimeLeft -= deltaTime;
             if (state.boostTimeLeft <= 0) {
@@ -243,9 +329,33 @@ export function updateOrderManager(deltaTime) {
             }
         }
 
-        // Drain delivery timer — slower if boosting
-        const drainRate = state.boostActive ? (1 / BOOST_SPEED) : 1.0;
-        state.currentDelivery.timeLeft -= deltaTime * drainRate;
+        // Endurance + progress
+        if (state.pedalHeld && state.pedalStallTime <= 0 && d.progress < d.distance) {
+            // Endurance drains
+            state.pedalEndurance -= ENDURANCE_DRAIN * deltaTime;
+            if (state.pedalEndurance <= 0) {
+                state.pedalEndurance = 0;
+                // Overexertion: forced stall, no more pedaling
+                state.pedalHeld = false;
+                pedalBtn.classList.remove("pedaling");
+                state.pedalStallTime = STALL_PENALTY;
+                notifyPedalReleased();
+            } else {
+                // Progress fills — slower with wear, faster with boost
+                const wearMult = 1 - bikeWear;
+                const boostMult = state.boostActive ? 2 : 1;
+                d.progress += BASE_PEDAL_RATE * wearMult * boostMult * deltaTime;
+                if (d.progress > d.distance) d.progress = d.distance;
+            }
+        } else if (!state.pedalHeld) {
+            // Recover endurance
+            state.pedalEndurance = Math.min(100, state.pedalEndurance + ENDURANCE_RECOVER * deltaTime);
+        }
+
+        // Delivery timer (cold food)
+        const drainRate = state.boostActive ? (1 / 1.5) : 1.0;
+        d.timeLeft -= deltaTime * drainRate;
+
         updateHazardSystem(deltaTime);
         updateDeliveryUI();
         return;
@@ -259,7 +369,7 @@ export function updateOrderManager(deltaTime) {
         return;
     }
 
-    // ---- IDLE — WAIT FOR NEXT ORDER ----
+    // ---- IDLE ----
     nextOrderIn -= deltaTime;
     if (nextOrderIn <= 0) {
         spawnOrder();
@@ -273,12 +383,21 @@ export function resetOrderManager() {
     orderTimeLeft = 0;
     nextOrderIn = 3;
     state.currentDelivery = null;
+    state.pedalHeld = false;
+    state.pedalEndurance = 100;
+    state.pedalStallTime = 0;
     state.boostActive = false;
     state.boostTimeLeft = 0;
     state.boostUsedThisDelivery = false;
     state.deliveriesThisShift = 0;
+    bikeWear = 0;
     actionsEl.classList.add("hidden");
     orderCard.classList.add("hidden");
     deliveryPanel.classList.add("hidden");
     resetHazards();
 }
+
+// Expose bike wear to other systems
+export function getBikeWear() { return bikeWear; }
+export function addBikeWear(amount) { bikeWear = Math.min(bikeWear + amount, 0.5); }
+export { WEAR_PER_HIT };

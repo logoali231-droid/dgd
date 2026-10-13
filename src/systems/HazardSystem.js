@@ -4,63 +4,82 @@ import { getUpgradeEffect } from './UpgradeSystem.js';
 import { getActiveEffect } from './PositionTracker.js';
 import { clamp } from '../utils/math.js';
 import { SFX } from './AudioManager.js';
+import { addBikeWear, WEAR_PER_HIT } from './OrderManager.js';
 
 // ---- DOM ----
-const hazardBtn   = document.getElementById("hazard-btn");
-const hazardIcon  = document.getElementById("hazard-icon");
-const hazardName  = document.getElementById("hazard-name");
-const hazardTimer = document.getElementById("hazard-timer");
+const hazardBanner  = document.getElementById("hazard-banner");
+const hazardIcon    = document.getElementById("hazard-icon");
+const hazardName    = document.getElementById("hazard-name");
+const hazardTimer   = document.getElementById("hazard-timer");
+const strikeBanner  = document.getElementById("strike-banner");
 
-// ---- MODULE STATE ----
+// ---- STATE ----
 let currentHazard = null;
 let hazardTimeLeft = 0;
 let nextHazardIn = 0;
+let nextRedLightIn = 0;
+let redLightActive = false;
+let redLightTimeLeft = 0;
 
 // ---- CONFIG ----
-const BASE_SPAWN_CHANCE  = 0.35;   // 35% per spawn tick, before modifiers
-const SPAWN_INTERVAL_MIN = 3.0;    // real seconds between spawn attempts
+const BASE_SPAWN_CHANCE  = 0.30;
+const SPAWN_INTERVAL_MIN = 3.0;
 const SPAWN_INTERVAL_MAX = 6.0;
+const RED_LIGHT_INTERVAL_MIN = 8.0;
+const RED_LIGHT_INTERVAL_MAX = 14.0;
+const RED_LIGHT_WINDOW = 2.0;
+const RED_LIGHT_MAX_STRIKES = 3;
 
-/**
- * Effective spawn chance — applies upgrade and position modifiers.
- */
 function getSpawnChance() {
     const upgradeReduction = getUpgradeEffect("hazardChanceReduction");
     const positionMult = getActiveEffect("hazardChanceMultiplier");
-
     let chance = BASE_SPAWN_CHANCE * (1 - upgradeReduction);
     if (positionMult !== null) chance *= positionMult;
     return Math.min(chance, 1.0);
 }
 
-/**
- * Start a fresh hazard cycle. Call on new delivery / shift reset.
- */
 export function resetHazards() {
     currentHazard = null;
     hazardTimeLeft = 0;
-    nextHazardIn = 2.5 + Math.random() * 2.0;  // first hazard can't fire instantly
-    hideHazardUI();
+    nextHazardIn = 2.5 + Math.random() * 2.0;
+    redLightActive = false;
+    redLightTimeLeft = 0;
+    nextRedLightIn = RED_LIGHT_INTERVAL_MIN + Math.random() * (RED_LIGHT_INTERVAL_MAX - RED_LIGHT_INTERVAL_MIN);
+    hideHazardBanner();
+    hideStrikeBanner();
 }
 
 /**
- * Player tapped the hazard — dodge it.
+ * Called by OrderManager when the player starts holding the pedal.
+ * While holding during a hazard, they're at risk.
  */
+export function notifyPedalHeld() {
+    // If a hazard is active AND pedal is now held → they're now vulnerable.
+    // No action needed — the hazard resolution checks pedalHeld at expiry.
+}
+
+/**
+ * Called when the player releases the pedal. If a hazard is active, this
+ * counts as a successful brake/dodge.
+ */
+export function notifyPedalReleased() {
+    if (currentHazard) {
+        dodgeHazard();
+    }
+    if (redLightActive && state.pedalHeld === false) {
+        // Released during red light = safe
+        endRedLight(false);
+    }
+}
+
 function dodgeHazard() {
     if (!currentHazard) return;
-
-    // Success!
     currentHazard = null;
     hazardTimeLeft = 0;
-    hideHazardUI();
-
-    // Small reward: push next hazard back a bit
+    hideHazardBanner();
     nextHazardIn = SPAWN_INTERVAL_MIN + Math.random() * (SPAWN_INTERVAL_MAX - SPAWN_INTERVAL_MIN);
 }
 
-/**
- * Spawn a hazard on the UI.
- */
 function spawnHazard() {
     currentHazard = getRandomHazard();
     hazardTimeLeft = currentHazard.reactionWindow;
@@ -68,79 +87,105 @@ function spawnHazard() {
     hazardIcon.textContent = currentHazard.emoji;
     hazardName.textContent = currentHazard.name;
     hazardTimer.textContent = `${hazardTimeLeft.toFixed(1)}s`;
-    hazardBtn.classList.remove("hidden");
-    hazardBtn.classList.add("pulsing");
-
-    // SFX for danger arrival
-    SFX.carHorn();  // fallback-friendly; if audio missing, silent
+    hazardBanner.classList.remove("hidden");
+    SFX.carHorn();
 }
 
 /**
- * Hazard wasn't dodged in time — apply penalties.
+ * Hazard window expired. If the player was holding (or re-held) the pedal
+ * at expiry, they hit it. If they released and stayed released, they dodged.
  */
 function resolveHazardHit() {
     if (!currentHazard) return;
-
     const h = currentHazard;
 
-    // Push the delivery timer forward (makes food go cold faster)
-    if (state.currentDelivery && h.timePenalty) {
-        state.currentDelivery.timeLeft -= h.timePenalty;
+    // If pedal is currently held → they didn't brake → HIT.
+    if (state.pedalHeld) {
+        if (state.currentDelivery && h.timePenalty) {
+            state.currentDelivery.timeLeft -= h.timePenalty;
+            // Knockback: lose progress
+            state.currentDelivery.progress = Math.max(0, state.currentDelivery.progress - 3);
+        }
+        if (h.ratingPenalty) {
+            state.rating = clamp(state.rating - h.ratingPenalty, 0, 5);
+            state.currentShiftWasPerfect = false;
+        }
+        // Bike wear accumulates
+        addBikeWear(WEAR_PER_HIT);
+        state.streakStats.hazardsHit = (state.streakStats.hazardsHit || 0) + 1;
     }
-
-    // Direct rating hit
-    if (h.ratingPenalty) {
-        state.rating = clamp(state.rating - h.ratingPenalty, 0, 5);
-        state.currentShiftWasPerfect = false;
-    }
-
-    // Log for streak (used later by positions)
-    state.streakStats.hazardsHit = (state.streakStats.hazardsHit || 0) + 1;
+    // If pedal wasn't held, no penalty (dodged via release)
 
     currentHazard = null;
     hazardTimeLeft = 0;
-    hideHazardUI();
-
-    // Reset spawn clock
+    hideHazardBanner();
     nextHazardIn = SPAWN_INTERVAL_MIN + Math.random() * (SPAWN_INTERVAL_MAX - SPAWN_INTERVAL_MIN);
 }
 
-function hideHazardUI() {
-    hazardBtn.classList.add("hidden");
-    hazardBtn.classList.remove("pulsing");
+function hideHazardBanner() {
+    hazardBanner.classList.add("hidden");
 }
 
-/**
- * Per-frame update. Only runs while a delivery is active.
- */
+function hideStrikeBanner() {
+    strikeBanner.classList.add("hidden");
+}
+
+// ---- RED LIGHT EVENTS ----
+function startRedLight() {
+    redLightActive = true;
+    redLightTimeLeft = RED_LIGHT_WINDOW;
+    strikeBanner.classList.remove("hidden");
+    strikeBanner.textContent = "🚦 RED LIGHT — RELEASE PEDAL!";
+}
+
+function endRedLight(strike) {
+    redLightActive = false;
+    redLightTimeLeft = 0;
+    hideStrikeBanner();
+
+    if (strike) {
+        state.redLightStrikes += 1;
+        strikeBanner.textContent = `🚦 STRIKE ${state.redLightStrikes}/${RED_LIGHT_MAX_STRIKES}`;
+        strikeBanner.classList.remove("hidden");
+        setTimeout(() => strikeBanner.classList.add("hidden"), 1200);
+
+        if (state.redLightStrikes >= RED_LIGHT_MAX_STRIKES) {
+            // Trigger a special death — handled by DeactivationSystem condition
+            // We just set a flag; DeactivationSystem reads it.
+            state.redLightStrikes = RED_LIGHT_MAX_STRIKES;
+        }
+    }
+
+    nextRedLightIn = RED_LIGHT_INTERVAL_MIN + Math.random() * (RED_LIGHT_INTERVAL_MAX - RED_LIGHT_INTERVAL_MIN);
+}
+
+// ---- UPDATE ----
 export function updateHazardSystem(deltaTime) {
     if (!state.currentDelivery) return;
 
-    // ---- Active hazard: tick reaction window ----
+    // ---- Red light timer ----
+    if (redLightActive) {
+        redLightTimeLeft -= deltaTime;
+        strikeBanner.textContent = `🚦 RED LIGHT — ${Math.max(redLightTimeLeft, 0).toFixed(1)}s`;
+        if (redLightTimeLeft <= 0) {
+            endRedLight(state.pedalHeld); // strike if still holding
+        }
+    } else {
+        nextRedLightIn -= deltaTime;
+        if (nextRedLightIn <= 0) startRedLight();
+    }
+
+    // ---- Hazard spawn / tick ----
     if (currentHazard) {
         hazardTimeLeft -= deltaTime;
         hazardTimer.textContent = `${Math.max(hazardTimeLeft, 0).toFixed(1)}s`;
-
-        if (hazardTimeLeft <= 0) {
-            resolveHazardHit();
-        }
+        if (hazardTimeLeft <= 0) resolveHazardHit();
         return;
     }
 
-    // ---- No hazard: count down to next spawn ----
     nextHazardIn -= deltaTime;
     if (nextHazardIn <= 0) {
-        // Roll for spawn using effective chance
-        if (Math.random() < getSpawnChance()) {
-            spawnHazard();
-        } else {
-            // No spawn this tick — schedule another attempt
-            nextHazardIn = SPAWN_INTERVAL_MIN + Math.random() * (SPAWN_INTERVAL_MAX - SPAWN_INTERVAL_MIN);
-        }
+        if (Math.random() < getSpawnChance()) spawnHazard();
+        else nextHazardIn = SPAWN_INTERVAL_MIN + Math.random() * (SPAWN_INTERVAL_MAX - SPAWN_INTERVAL_MIN);
     }
 }
-
-// ---- Bind the button ----
-hazardBtn.addEventListener("click", () => {
-    if (currentHazard) dodgeHazard();
-});
