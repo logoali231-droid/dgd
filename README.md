@@ -1,39 +1,43 @@
-# Assets
+# Don't Get Deactivated!
 
-Drop real files here when ready. The game runs fine with missing files —
-sprite loads resolve to `null` and the code falls back to emoji.
-Audio plays silently if files are missing.
+> *"You're not an employee. You're a line item."*
 
-## Folder Map
+A gig-economy rogue-lite survival game where you play as a delivery courier racing against a cold-food timer, hostile traffic, and a mysterious Algorithm that monitors your every move — and is always ready to deactivate you for reasons that range from the mundane ("soup was warm, not piping hot") to the absurd ("you paused to pet a cat").
 
-| Folder | Files |
-|---|---|
-| `sprites/characters/` | Player + NPC courier sprites |
-| `sprites/customers/` | Customer archetype sprites |
-| `sprites/hazards/` | Road hazards (dog, pothole, etc.) |
-| `sprites/items/` | Food and gear icons |
-| `sprites/ui/` | Star, battery, energy, cash icons |
-| `sprites/logbook/` | Pixel art per deactivation reason |
-| `sprites/backgrounds/` | Menu/map backgrounds |
-| `audio/sfx/` | Short sound effects (.wav) |
-| `audio/music/` | Looping tracks (.ogg) |
+---
 
-## Recommended Sources
+## 🙏 A Loving Tribute to *Don't Get Fired!*
 
-- **Kenney.nl** — free CC0 sprites, tons of UI and character packs
-- **itch.io** — search "free pixel art game assets"
-- **OpenGameArt.org** — community assets, various licenses
-- **AI tools**: Retro Diffusion, Makko, PixelVibe
+**This project is directly inspired by, and openly a tribute to, [_Don't Get Fired!_](https://quickturtle.itch.io/) by QuickTurtle.**
 
-## Sprite Size Guide
+*Don't Get Fired!* is a brilliant little game about the absurdity of modern work — the arbitrary metrics, the merciless reviews, the way your entire career can be ended by a single customer complaint. Playing it made us want to explore that same feeling from a different angle: the **gig economy delivery courier**, where the Algorithm doesn't even pretend to be human anymore.
 
-- Characters: 32×32 or 48×48
-- Items: 16×16 or 24×24
-- UI icons: 16×16
-- Logbook pixel art: 64×64
-- Backgrounds: 420×840 (matches game-container)
+**Every design decision in this project is a respectful descendant of QuickTurtle's original.** The hidden positions, the escalating deactivations, the survival chance system, the logbook of failures, the tone of corporate satire — all of it lives in the shadow of *Don't Get Fired!* and would not exist without it.
 
-## Reference
+If you haven't played the original, **please go do so**. It's the reason this project exists.
 
-All paths are registered in `src/assets.js`. Add new files there
-first so the rest of the code can find them.
+- **Play *Don't Get Fired!*** → [quickturtle.itch.io](https://quickturtle.itch.io/)
+
+**What we are NOT doing:**
+- We are not copying any assets, code, music, sound, or text from *Don't Get Fired!*
+- We are not shipping a clone or a modification of their game
+- We are not using their name, characters, or branding
+
+**What we ARE doing:**
+- Borrowing the *design spirit* — the satire, the mechanics-of-failure, the tone
+- Building an original game with original code, writing, and (soon) original art and music
+- Giving credit where it's due, loudly and often
+
+If any representative of QuickTurtle ever wants this project renamed, restructured, or taken down, we'll comply immediately and without argument. This is a fan work made with genuine admiration.
+
+---
+
+## 🎮 The Game
+
+You are a courier for an unnamed delivery platform. Your shift lasts 12 in-game hours. You accept orders, hold a pedal to ride to the customer, release to brake for hazards, boost when things get tight, and try to survive until the clock runs out.
+
+**Every run ends one of two ways:**
+1. **You complete the shift** — earning cash, saved tips, and (if you're lucky) a hidden position that buffs your next run.
+2. **You get deactivated** — the Algorithm flags you for something, and a new entry goes in your Deactivation Logbook. Every death teaches you something, and every repeat death increases your survival chance against that specific reason.
+
+### Core Loop
