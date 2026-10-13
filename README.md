@@ -8,7 +8,7 @@ A gig-economy rogue-lite survival game where you play as a delivery courier raci
 
 ## 🙏 A Loving Tribute to *Don't Get Fired!*
 
-**This project is directly inspired by, and openly a tribute to, [_Don't Get Fired!_](https://quickturtle.itch.io/) by QuickTurtle.**
+**This project is directly inspired by, and openly a tribute to, [_Don't Get Fired!_]([https://quickturtle.itch.io/](https://play.google.com/store/apps/details?id=com.quickturtle.EmployeeSurvival_en&pli=1)) by QuickTurtle.**
 
 *Don't Get Fired!* is a brilliant little game about the absurdity of modern work — the arbitrary metrics, the merciless reviews, the way your entire career can be ended by a single customer complaint. Playing it made us want to explore that same feeling from a different angle: the **gig economy delivery courier**, where the Algorithm doesn't even pretend to be human anymore.
 
@@ -16,7 +16,7 @@ A gig-economy rogue-lite survival game where you play as a delivery courier raci
 
 If you haven't played the original, **please go do so**. It's the reason this project exists.
 
-- **Play *Don't Get Fired!*** → [quickturtle.itch.io](https://quickturtle.itch.io/)
+- **Play *Don't Get Fired!*** → [[quickturtle.itch.io](https://quickturtle.itch.io/](https://play.google.com/store/apps/details?id=com.quickturtle.EmployeeSurvival_en&pli=1))
 
 **What we are NOT doing:**
 - We are not copying any assets, code, music, sound, or text from *Don't Get Fired!*
