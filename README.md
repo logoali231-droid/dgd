@@ -16,7 +16,7 @@ A gig-economy rogue-lite survival game where you play as a delivery courier raci
 
 If you haven't played the original, **please go do so**. It's the reason this project exists.
 
-- **Play *Don't Get Fired!*** → [[quickturtle.itch.io](https://quickturtle.itch.io/](https://play.google.com/store/apps/details?id=com.quickturtle.EmployeeSurvival_en&pli=1))
+- **Play *Don't Get Fired!*** → [[[quickturtle.itch.io](https://quickturtle.itch.io/](https://play.google.com/store/apps/details?id=com.quickturtle.EmployeeSurvival_en&pli=1))](https://play.google.com/store/apps/details?id=com.quickturtle.EmployeeSurvival_en&pli=1)
 
 **What we are NOT doing:**
 - We are not copying any assets, code, music, sound, or text from *Don't Get Fired!*
