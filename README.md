@@ -6,31 +6,32 @@ A gig-economy rogue-lite survival game where you play as a delivery courier raci
 
 ---
 
-## 🙏 A Loving Tribute to *Don't Get Fired!*
+## 🙏 A Tribute to *Don't Get Fired!*
 
-**This project is directly inspired by, and openly a tribute to, [_Don't Get Fired!_][([https://quickturtle.itch.io/](https://play.google.com/store/apps/details?id=com.quickturtle.EmployeeSurvival_en&pli=1))](https://play.google.com/store/apps/details?id=com.quickturtle.EmployeeSurvival_en&pli=1) by QuickTurtle.**
+**Don't Get Deactivated! is an independent game inspired by [_Don't Get Fired!_](https://play.google.com/store/apps/details?id=com.quickturtle.EmployeeSurvival_en) by QuickTurtle.**
 
-*Don't Get Fired!* is a brilliant little game about the absurdity of modern work — the arbitrary metrics, the merciless reviews, the way your entire career can be ended by a single customer complaint. Playing it made us want to explore that same feeling from a different angle: the **gig economy delivery courier**, where the Algorithm doesn't even pretend to be human anymore.
+The original game inspired us to explore a related question: what happens when the absurdity of workplace survival moves from the corporate office to the gig economy?
 
-**Every design decision in this project is a respectful descendant of QuickTurtle's original.** The hidden positions, the escalating deactivations, the survival chance system, the logbook of failures, the tone of corporate satire — all of it lives in the shadow of *Don't Get Fired!* and would not exist without it.
+In *Don't Get Deactivated!*, you play as a delivery courier struggling against arbitrary ratings, unreasonable customers, dangerous streets, and an Algorithm that treats people as disposable metrics.
 
-If you haven't played the original, **please go do so**. It's the reason this project exists.
+While the original explores corporate career survival, this project approaches the theme through delivery gameplay, pedal-based movement, stamina management, road hazards, food-temperature deadlines, and persistent progression between shifts.
 
-- **Play *Don't Get Fired!*** → [[[quickturtle.itch.io](https://quickturtle.itch.io/](https://play.google.com/store/apps/details?id=com.quickturtle.EmployeeSurvival_en&pli=1))](https://play.google.com/store/apps/details?id=com.quickturtle.EmployeeSurvival_en&pli=1)
+### What this project aims to do
 
-**What we are NOT doing:**
-- We are not copying any assets, code, music, sound, or text from *Don't Get Fired!*
-- We are not shipping a clone or a modification of their game
-- We are not using their name, characters, or branding
+- Explore related themes of precarious work, arbitrary evaluations, and dark corporate humor.
+- Develop its own gameplay systems, code, dialogue, and narrative.
+- Build an independent identity through original art, audio, and future content.
 
-**What we ARE doing:**
-- Borrowing the *design spirit* — the satire, the mechanics-of-failure, the tone
-- Building an original game with original code, writing, and (soon) original art and music
-- Giving credit where it's due, loudly and often
+This project is a work in progress. Placeholder visuals and other unfinished elements may still be present.
 
-If any representative of QuickTurtle ever wants this project renamed, restructured, or taken down, we'll comply immediately and without argument. This is a fan work made with genuine admiration.
+### Support the original
 
----
+If you enjoy this project's inspiration, check out the original game by QuickTurtle:
+
+- [Play *Don't Get Fired!* on Google Play](https://play.google.com/store/apps/details?id=com.quickturtle.EmployeeSurvival_en)
+- [Find *Don't Get Fired!* on the App Store](https://apps.apple.com/us/app/dont-get-fired/id1008957297)
+
+The original deserves recognition for inspiring this project. Please support its creators!
 
 ## 🎮 The Game
 
