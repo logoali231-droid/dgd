@@ -1,0 +1,13 @@
+{
+  "name": "a61df1b65fd0c27fb3aa0837",
+  "version": "1.0.0",
+  "description": "> *\"You're not an employee. You're a line item.\"*",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module"
+}
