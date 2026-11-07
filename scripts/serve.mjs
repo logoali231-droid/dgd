@@ -31,6 +31,12 @@ const MIME = {
   '.map': 'application/json'
 };
 
+// File extensions that are definitely static assets (not routes)
+const STATIC_EXTENSIONS = new Set([
+  '.html', '.js', '.mjs', '.css', '.json', '.png', '.jpg', '.jpeg', '.gif',
+  '.svg', '.ico', '.webp', '.mp3', '.wav', '.ogg', '.map'
+]);
+
 const server = http.createServer(async (req, res) => {
   try {
     let url = req.url || '/';
@@ -53,8 +59,10 @@ const server = http.createServer(async (req, res) => {
     }
 
     let target = decodeURIComponent(pathname);
-    // SPA fallback: serve index.html for any non-asset path
-    if (!target.startsWith('/assets/') && !target.startsWith('/sprites/') && !target.startsWith('/audio/')) {
+
+    // SPA fallback: only for paths without a file extension (i.e., routes)
+    const ext = extname(target).toLowerCase();
+    if (ext === '' && !target.startsWith('/assets/') && !target.startsWith('/sprites/') && !target.startsWith('/audio/')) {
       target = '/index.html';
     }
 

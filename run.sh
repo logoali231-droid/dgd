@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
 # ============================================================
-# Don't Get Deactivated! — Run Anywhere
+# Don't Get Deactivated! — Run Anywhere (PWA Ready)
 # macOS / Linux launcher
+#
+# Install:     chmod +x run.sh && ./run.sh
+# Run anywhere: Works offline via PWA (after first visit)
 # ============================================================
 set -euo pipefail
 

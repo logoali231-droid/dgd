@@ -4,15 +4,17 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <meta name="theme-color" content="#0d0d0d" />
+    <meta name="description" content="A gig-economy rogue-lite survival game. Play as a delivery courier racing against a cold-food timer, hostile traffic, and a mysterious Algorithm." />
     <title>Don't Get Deactivated!</title>
+    <link rel="manifest" href="manifest.json" />
+    <link rel="icon" type="image/png" href="icon-192.png" />
+    <link rel="apple-touch-icon" href="icon-192.png" />
     <link rel="stylesheet" href="styles/variables.css" />
     <link rel="stylesheet" href="styles/layout.css" />
     <link rel="stylesheet" href="styles/components.css" />
     <link rel="stylesheet" href="styles/animations.css" />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"
-      rel="stylesheet"
-    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet" />
   </head>
   <body>
     <div id="game-container">
@@ -40,10 +42,10 @@
             <span class="label"><span class="hud-icon" id="hud-cash-icon">💵</span>Cash:</span><span id="ui-cash">$0.00</span>
           </div>
           <div class="stat-box">
-            <span class="label">🕐 Shift:</span><span id="ui-time">12:00:00</span>
+            <label for="ui-time">🕐 Shift:</label><span id="ui-time">12:00:00</span>
           </div>
           <div class="stat-box">
-            <span class="label">🔥 Streak:</span><span id="ui-streak">0</span>
+            <label for="ui-streak">🔥 Streak:</label><span id="ui-streak">0</span>
           </div>
         </div>
       </header>

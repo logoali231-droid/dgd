@@ -201,3 +201,16 @@ document.addEventListener("keydown", (e) => {
         }
     }
 });
+
+// ─── PWA: register service worker for offline play ───
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js')
+      .then((registration) => {
+        console.log('[PWA] Service worker registered:', registration.scope);
+      })
+      .catch((error) => {
+        console.warn('[PWA] Service worker registration failed:', error);
+      });
+  });
+}
