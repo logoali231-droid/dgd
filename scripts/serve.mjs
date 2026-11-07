@@ -1,12 +1,16 @@
 // Playwright-free dev server for the DGD solo prototype (Node 18+).
 import http from 'node:http';
 import { readFile } from 'node:fs/promises';
-import { extname, join, normalize } from 'node:path';
+import { extname, join, normalize, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
-const ROOT = join(__dirname, '..');
-const PORT = process.env.PORT || 3000;
+const ROOT = resolve(__dirname, '..');
+
+// Bind to 0.0.0.0 so the server is reachable from any network interface
+// (e.g., the game's real device, not just the machine running the server).
+const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
+const HOST = process.env.HOST || '0.0.0.0';
 
 const MIME = {
   '.html': 'text/html; charset=utf-8',
@@ -49,6 +53,7 @@ const server = http.createServer(async (req, res) => {
     }
 
     let target = decodeURIComponent(pathname);
+    // SPA fallback: serve index.html for any non-asset path
     if (!target.startsWith('/assets/') && !target.startsWith('/sprites/') && !target.startsWith('/audio/')) {
       target = '/index.html';
     }
@@ -80,6 +85,9 @@ const server = http.createServer(async (req, res) => {
   }
 });
 
-server.listen(PORT, () => {
-  console.log(`DGD dev server listening on http://localhost:${PORT}`);
+server.listen(PORT, HOST, () => {
+  console.log(`\n  🚴 Don't Get Deactivated! — ready to play`);
+  console.log(`  🌐 Local:   http://localhost:${PORT}`);
+  console.log(`  🌍 Network: http://<your-ip>:${PORT}`);
+  console.log(`  📱 Open one of the URLs above on your device.\n`);
 });
