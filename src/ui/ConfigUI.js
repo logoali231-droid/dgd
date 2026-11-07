@@ -10,21 +10,11 @@ const wipeRoot       = document.getElementById("wipe-root");
 const wipeBtn        = document.getElementById("wipe-btn");
 const wipeStageEl    = document.getElementById("wipe-stage");
 
-// ---- WIPE GAUNTLET STATE ----
-// 0 = idle button. 1-3 = escalating confirmations. 4 = final wipe.
-let wipeStage = 0;
+// ---- Wipe gauntlet state ----
+let wipeStage = 0; // 0 = idle button, 1-3 = confirmations, 4 = loading wipe
 
-export function renderConfig() {
-    soundBtn.textContent = `🔊 Sound: ${state.settings.soundOn ? "ON" : "OFF"}`;
-    vibrationBtn.textContent = `📳 Vibration: ${state.settings.vibrationOn ? "ON" : "OFF"}`;
-
-    // Reset the gauntlet any time we enter config
-    wipeStage = 0;
-    renderWipeStage();
-}
-
+/** Show the current wipe stage */
 function renderWipeStage() {
-    // Clear prior staged content
     wipeStageEl.innerHTML = "";
 
     if (wipeStage === 0) {
@@ -33,45 +23,36 @@ function renderWipeStage() {
         return;
     }
 
-    // Stage 1–3: escalating confirmations. Hide the raw button.
     wipeBtn.classList.add("hidden");
 
-    if (wipeStage === 1) {
-        renderConfirmStep({
-            message: "This action cannot be undone.",
-            checkboxLabel: "I understand this cannot be undone",
-            nextLabel: "Next",
-            onNext: () => { wipeStage = 2; renderWipeStage(); },
-            onCancel: () => { wipeStage = 0; renderWipeStage(); }
-        });
-    }
-    else if (wipeStage === 2) {
-        renderConfirmStep({
-            message: `Are you SURE you wanna leave your chance of success? You've survived ${state.shiftsSurvived} shifts and saved ${"$" + state.savedTips.toFixed(2)}.`,
-            checkboxLabel: "Yes, I really want to leave my chance of success",
-            nextLabel: "Next",
-            onNext: () => { wipeStage = 3; renderWipeStage(); },
-            onCancel: () => { wipeStage = 0; renderWipeStage(); }
-        });
-    }
-    else if (wipeStage === 3) {
-        renderConfirmStep({
-            message: "FINAL WARNING. Every shift. Every upgrade. Every logbook entry. Gone forever. There is no appeal. No undo. No second chances.",
-            checkboxLabel: "I accept that I will lose everything",
-            nextLabel: "Yes, wipe everything",
-            danger: true,
-            onNext: () => { actuallyWipe(); },
-            onCancel: () => { wipeStage = 0; renderWipeStage(); }
-        });
-    }
-}
+    // Stages 1-3: escalating confirmations with checkbox + next/cancel buttons
+    const stageConfigs = [{
+        message: "This action cannot be undone.",
+        checkboxLabel: "I understand this cannot be undone",
+        nextLabel: "Next",
+        onNext: () => { wipeStage = 2; renderWipeStage(); },
+        onCancel: () => { wipeStage = 0; renderWipeStage(); }
+    }, {
+        message: `Are you SURE you wanna leave your chance of success? You've survived ${state.shiftsSurvived} shifts and saved $${state.savedTips.toFixed(2)}.`,
+        checkboxLabel: "Yes, I really want to leave my chance of success",
+        nextLabel: "Next",
+        onNext: () => { wipeStage = 3; renderWipeStage(); },
+        onCancel: () => { wipeStage = 0; renderWipeStage(); }
+    }, {
+        message: "FINAL WARNING. Every shift. Every upgrade. Every logbook entry. Gone forever. There is no appeal. No undo. No second chances.",
+        checkboxLabel: "I accept that I will lose everything",
+        nextLabel: "Yes, wipe everything",
+        danger: true,
+        onNext: () => { wipeStage = 4; renderWipeStage(); },
+        onCancel: () => { wipeStage = 0; renderWipeStage(); }
+    }];
 
-function renderConfirmStep({ message, checkboxLabel, nextLabel, danger, onNext, onCancel }) {
+    const cfg = stageConfigs[wipeStage - 1];
+
     // Message
     const msg = document.createElement("p");
-    msg.className = "wipe-message";
-    msg.textContent = message;
-    if (danger) msg.classList.add("danger");
+    msg.className = "wipe-message" + (cfg.danger ? " danger" : "");
+    msg.textContent = cfg.message;
     wipeStageEl.appendChild(msg);
 
     // Checkbox
@@ -81,7 +62,7 @@ function renderConfirmStep({ message, checkboxLabel, nextLabel, danger, onNext, 
     cb.type = "checkbox";
     cb.id = "wipe-ack";
     wrap.appendChild(cb);
-    wrap.appendChild(document.createTextNode(" " + checkboxLabel));
+    wrap.appendChild(document.createTextNode(" " + cfg.checkboxLabel));
     wipeStageEl.appendChild(wrap);
 
     // Buttons
@@ -89,9 +70,9 @@ function renderConfirmStep({ message, checkboxLabel, nextLabel, danger, onNext, 
     btnRow.className = "wipe-button-row";
 
     const next = document.createElement("button");
-    next.textContent = nextLabel;
+    next.textContent = cfg.nextLabel;
     next.disabled = true;
-    next.className = danger ? "wipe-next danger" : "wipe-next";
+    next.className = cfg.danger ? "wipe-next danger" : "wipe-next";
     btnRow.appendChild(next);
 
     const cancel = document.createElement("button");
@@ -101,35 +82,46 @@ function renderConfirmStep({ message, checkboxLabel, nextLabel, danger, onNext, 
 
     wipeStageEl.appendChild(btnRow);
 
-    // Enable Next only when checkbox checked
+    // Enable Next only when checkbox is checked
     cb.addEventListener("change", () => {
         next.disabled = !cb.checked;
     });
-
     next.addEventListener("click", () => {
-        if (cb.checked) onNext();
+        if (cb.checked) cfg.onNext();
     });
-    cancel.addEventListener("click", onCancel);
+    cancel.addEventListener("click", cfg.onCancel);
 }
 
-function actuallyWipe() {
-    // Optional shake for drama
-    shakeScreen(3, 500);
+/** Final wipe: confirm, save, reload */
+function performWipe() {
+    // Safety: ensure wipeStage is 3 (final warning reached)
+    if (wipeStage !== 4) return;
 
+    // Reveal the wipe in progress state
     wipeStageEl.innerHTML = "";
     const msg = document.createElement("p");
     msg.className = "wipe-message danger";
     msg.textContent = "Wiping... Goodbye.";
+    msg.style.fontSize = "8px";
     wipeStageEl.appendChild(msg);
 
-    // Persist wipe, then reload page (cleanest reset — reloads state module)
+    // Persist wipe, then reload page
     setTimeout(() => {
         Persistence.reset();
-        location.reload();
+        // Force die cleanly (rewrite location to avoid any caching)
+        location.href = "about:blank";
+        setTimeout(() => location.reload(), 50);
     }, 1200);
 }
 
-// ---- Event listeners ----
+// ---- Export ----
+export function renderConfig() {
+    soundBtn.textContent = `🔊 Sound: ${state.settings.soundOn ? "ON" : "OFF"}`;
+    vibrationBtn.textContent = `📳 Vibration: ${state.settings.vibrationOn ? "ON" : "OFF"}`;
+    wipeStage = 0;
+    renderWipeStage();
+}
+
 export function bindConfigListeners() {
     soundBtn.addEventListener("click", () => {
         toggleSound();
@@ -139,22 +131,26 @@ export function bindConfigListeners() {
     vibrationBtn.addEventListener("click", () => {
         toggleVibration();
         vibrationBtn.textContent = `📳 Vibration: ${state.settings.vibrationOn ? "ON" : "OFF"}`;
-        // Give feedback
-        if (state.settings.vibrationOn) shakeScreen(1, 200);
+        if (state.settings.vibrationOn) {
+            shakeScreen(1, 150);
+        }
     });
 
-    // Hover shenanigans
-    wipeBtn.addEventListener("mouseenter", () => {
-        if (wipeStage === 0) wipeBtn.textContent = "DON'T!";
-    });
-    wipeBtn.addEventListener("mouseleave", () => {
-        if (wipeStage === 0) wipeBtn.textContent = "🗑 Wipe Data";
-    });
-    wipeBtn.addEventListener("touchstart", () => {
-        if (wipeStage === 0) wipeBtn.textContent = "DON'T!";
-    }, { passive: true });
-
+    // Wipe button handlers — mouse, touch, keyboard
     wipeBtn.addEventListener("click", () => {
         if (wipeStage === 0) { wipeStage = 1; renderWipeStage(); }
+    });
+
+    wipeBtn.addEventListener("touchstart", (e) => {
+        e.preventDefault();
+        if (wipeStage === 0) { wipeStage = 1; renderWipeStage(); }
+    }, { passive: false });
+
+    // Keyboard (Enter/Space) — via default button behavior + explicit handling
+    wipeBtn.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            if (wipeStage === 0) { wipeStage = 1; renderWipeStage(); }
+        }
     });
 }

@@ -1,0 +1,99 @@
+/* ============ ANIMATIONS ============ */
+
+/* Loading spinner */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Toast slide in/out */
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(20px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes slideOut {
+  to { opacity: 0; transform: translateX(20px); }
+}
+
+/* Hazard pulse (duplicated here for safety) */
+@keyframes hazardPulse {
+  from { border-color: #ff4444; box-shadow: 0 0 0 0 rgba(255,68,68,0.25); }
+  to   { border-color: #ff8888; box-shadow: 0 0 14px 4px rgba(255,68,68,0.4); }
+}
+
+/* Screen shake (applies to #game-container) */
+@keyframes shakeAnim {
+  0%, 100% { transform: translate(0, 0); }
+  10% { transform: translate(-3px, 2px); }
+  20% { transform: translate(3px, -2px); }
+  30% { transform: translate(-2px, -3px); }
+  40% { transform: translate(2px, 3px); }
+  50% { transform: translate(-3px, 1px); }
+  60% { transform: translate(3px, -1px); }
+  70% { transform: translate(-1px, 3px); }
+  80% { transform: translate(1px, -3px); }
+  90% { transform: translate(-2px, -1px); }
+}
+
+/* Staggered reveal for UI lists */
+@keyframes fadeSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.shop-item,
+.logbook-entry {
+  animation: fadeSlideUp 0.3s ease-out both;
+}
+.shop-item:nth-child(1) { animation-delay: 0.05s; }
+.shop-item:nth-child(2) { animation-delay: 0.10s; }
+.shop-item:nth-child(3) { animation-delay: 0.15s; }
+.shop-item:nth-child(4) { animation-delay: 0.20s; }
+.shop-item:nth-child(5) { animation-delay: 0.25s; }
+.shop-item:nth-child(6) { animation-delay: 0.30s; }
+.shop-item:nth-child(7) { animation-delay: 0.35s; }
+.shop-item:nth-child(8) { animation-delay: 0.40s; }
+.shop-item:nth-child(9) { animation-delay: 0.45s; }
+.shop-item:nth-child(10) { animation-delay: 0.50s; }
+.shop-item:nth-child(11) { animation-delay: 0.55s; }
+.shop-item:nth-child(12) { animation-delay: 0.60s; }
+.shop-item:nth-child(13) { animation-delay: 0.65s; }
+.shop-item:nth-child(14) { animation-delay: 0.70s; }
+.shop-item:nth-child(15) { animation-delay: 0.75s; }
+.shop-item:nth-child(16) { animation-delay: 0.80s; }
+
+.logbook-entry:nth-child(1)  { animation-delay: 0.03s; }
+.logbook-entry:nth-child(2)  { animation-delay: 0.06s; }
+.logbook-entry:nth-child(3)  { animation-delay: 0.09s; }
+.logbook-entry:nth-child(4)  { animation-delay: 0.12s; }
+.logbook-entry:nth-child(5)  { animation-delay: 0.15s; }
+.logbook-entry:nth-child(6)  { animation-delay: 0.18s; }
+.logbook-entry:nth-child(7)  { animation-delay: 0.21s; }
+.logbook-entry:nth-child(8)  { animation-delay: 0.24s; }
+.logbook-entry:nth-child(9)  { animation-delay: 0.27s; }
+.logbook-entry:nth-child(10) { animation-delay: 0.30s; }
+.logbook-entry:nth-child(11) { animation-delay: 0.33s; }
+.logbook-entry:nth-child(12) { animation-delay: 0.36s; }
+.logbook-entry:nth-child(13) { animation-delay: 0.39s; }
+.logbook-entry:nth-child(14) { animation-delay: 0.42s; }
+.logbook-entry:nth-child(15) { animation-delay: 0.45s; }
+.logbook-entry:nth-child(16) { animation-delay: 0.48s; }
+.logbook-entry:nth-child(17) { animation-delay: 0.51s; }
+.logbook-entry:nth-child(18) { animation-delay: 0.54s; }
+.logbook-entry:nth-child(19) { animation-delay: 0.57s; }
+.logbook-entry:nth-child(20) { animation-delay: 0.60s; }
+
+/* Fade in for new positions appear in shift complete */
+@keyframes popIn {
+  0%   { transform: scale(0.8); opacity: 0; }
+  60%  { transform: scale(1.05); opacity: 1; }
+  100% { transform: scale(1); }
+}
+.pop-in {
+  animation: popIn 0.35s ease-out both;
+}

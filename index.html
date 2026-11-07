@@ -2,11 +2,13 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="theme-color" content="#0d0d0d" />
     <title>Don't Get Deactivated!</title>
     <link rel="stylesheet" href="styles/variables.css" />
     <link rel="stylesheet" href="styles/layout.css" />
     <link rel="stylesheet" href="styles/components.css" />
+    <link rel="stylesheet" href="styles/animations.css" />
     <link
       href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"
       rel="stylesheet"
@@ -14,126 +16,142 @@
   </head>
   <body>
     <div id="game-container">
-      <div id="hud">
+
+      <!-- Top HUD bar -->
+      <header id="top-hud">
         <div id="phase-bar">
           <span id="phase-emoji">🌅</span>
           <span id="phase-name">MORNING RUSH</span>
           <span id="phase-tier">ROOKIE</span>
         </div>
-        <div class="stat-box">
-          <span class="label">Rating:</span><span id="ui-rating">5.0</span>
+        <div class="hud-row">
+          <div class="stat-box">
+            <span class="label"><span class="hud-icon" id="hud-rating-icon">⭐</span>Rating:</span><span id="ui-rating">5.0</span>
+          </div>
+          <div class="stat-box">
+            <span class="label"><span class="hud-icon" id="hud-energy-icon">⚡</span>Energy:</span><span id="ui-energy">100%</span>
+          </div>
+          <div class="stat-box">
+            <span class="label"><span class="hud-icon" id="hud-battery-icon">🔋</span>Battery:</span><span id="ui-battery">100%</span>
+          </div>
         </div>
-        <div class="stat-box">
-          <span class="label">Energy:</span><span id="ui-energy">100%</span>
+        <div class="hud-row">
+          <div class="stat-box stat-cash">
+            <span class="label"><span class="hud-icon" id="hud-cash-icon">💵</span>Cash:</span><span id="ui-cash">$0.00</span>
+          </div>
+          <div class="stat-box">
+            <span class="label">🕐 Shift:</span><span id="ui-time">12:00:00</span>
+          </div>
+          <div class="stat-box">
+            <span class="label">🔥 Streak:</span><span id="ui-streak">0</span>
+          </div>
         </div>
-        <div class="stat-box">
-          <span class="label">Battery:</span><span id="ui-battery">100%</span>
-        </div>
-        <div class="stat-box">
-          <span class="label">Cash:</span><span id="ui-cash">$0.00</span>
-        </div>
-        <div class="stat-box">
-          <span class="label">Shift:</span><span id="ui-time">12:00:00</span>
-        </div>
-        <div class="stat-box">
-          <span class="label">Streak:</span><span id="ui-streak">0</span>
-        </div>
-      </div>
-      <div id="positions-bar"></div>
+      </header>
 
+      <!-- Positions dock -->
+      <div id="positions-bar" class="positions-dock"></div>
+
+      <!-- MAIN GAME AREA -->
       <div id="game-area">
+
         <!-- CAREER HUB (start screen) -->
-        <div id="screen-start" class="screen">
+        <section id="screen-start" class="screen" aria-label="Career Hub">
           <h1 id="game-state-text">🚴 COURIER HUB</h1>
 
           <div id="hub-stats">
-            <p>Streak: <span id="hub-streak">0</span></p>
-            <p>Tier: <span id="hub-tier">Rookie</span></p>
-            <p>Tips: <span id="hub-tips">$0.00</span></p>
-            <p>Best: <span id="hub-best">5.0</span></p>
+            <p><span class="stat-label">Streak:</span> <span id="hub-streak">0</span></p>
+            <p><span class="stat-label">Tier:</span> <span id="hub-tier">Rookie</span></p>
+            <p><span class="stat-label">Tips:</span> <span id="hub-tips">$0.00</span></p>
+            <p><span class="stat-label">Best:</span> <span id="hub-best">5.0</span></p>
           </div>
 
           <div id="hub-positions"></div>
           <div id="hub-last-death"></div>
 
           <div id="start-actions">
-            <button id="start-btn">Start Shift</button>
-            <button id="shop-start-btn">🛒 Shop</button>
-            <button id="logbook-btn">📖 Logbook</button>
-            <button id="config-btn">⚙️ Config</button>
+            <button id="start-btn" class="btn-primary btn-large">Start Shift</button>
+            <div class="btn-row">
+              <button id="shop-start-btn" class="btn-secondary">🛒 Shop</button>
+              <button id="logbook-btn" class="btn-secondary">📖 Logbook</button>
+              <button id="config-btn" class="btn-secondary">⚙️ Config</button>
+            </div>
           </div>
-        </div>
+        </section>
 
         <!-- GAME -->
-        <div id="screen-game" class="screen hidden">
-          <p id="game-status-text">Waiting for orders...</p>
+        <section id="screen-game" class="screen hidden" aria-label="Game">
+          <p id="game-status-text" class="game-status">Waiting for orders...</p>
 
           <div id="consumable-bar">
-            <button id="use-coffee-btn" class="consumable-btn">
+            <button id="use-coffee-btn" class="consumable-btn" disabled>
               ☕ Coffee <span id="coffee-count">x0</span>
             </button>
-            <button id="use-powerbank-btn" class="consumable-btn">
+            <button id="use-powerbank-btn" class="consumable-btn" disabled>
               🔋 Power Bank <span id="powerbank-count">x0</span>
             </button>
           </div>
 
-          <div id="order-card" class="hidden">
+          <div id="order-card" class="card hidden">
             <p id="order-food">🍕 Pizza</p>
             <p id="order-customer-type">🙂 The Polite</p>
             <p id="order-customer-tagline">Standard expectations.</p>
-            <p id="order-restaurant">Restaurant Name</p>
-            <p id="order-distance">🏠 Close · Downtown</p>
+            <div class="sub-row">
+              <span id="order-restaurant">Restaurant Name</span>
+              <span id="order-distance" class="distance close">🏠 Close · Downtown</span>
+            </div>
             <p id="order-customer">Customer #1234</p>
             <p id="order-pay">$0.00</p>
-          </div>
-          <div id="order-actions" class="hidden">
-            <button id="accept-btn">Accept</button>
-            <button id="decline-btn">Decline</button>
+            <div id="order-actions" class="hidden">
+              <button id="accept-btn" class="btn-primary btn-block">Accept</button>
+              <button id="decline-btn" class="btn-secondary btn-block">Decline</button>
+            </div>
           </div>
 
-          <div id="delivery-panel" class="hidden">
+          <div id="delivery-panel" class="card hidden">
             <p id="delivery-food">🍕 Pizza</p>
-            <p id="delivery-timer">30s</p>
+            <div class="delivery-top">
+              <span id="delivery-timer" class="delivery-timer">30s</span>
+              <span id="progress-text" class="progress-text">0 / 0</span>
+            </div>
             <div id="progress-bar"><div id="progress-fill"></div></div>
-            <p id="progress-text">0 / 0</p>
             <div id="endurance-bar"><div id="endurance-fill"></div></div>
-            <p id="endurance-text">Endurance</p>
+            <p id="endurance-text" class="endurance-text">Endurance</p>
 
-            <div id="hazard-banner" class="hidden">
+            <div id="hazard-banner" class="banner hidden">
               <span id="hazard-icon">🕳️</span>
               <span id="hazard-name">Pothole</span>
               <span id="hazard-timer">2.0s</span>
               <span id="hazard-hint">RELEASE PEDAL!</span>
             </div>
 
-            <div id="strike-banner" class="hidden">
+            <div id="strike-banner" class="banner hidden">
               🚦 RED LIGHT — RELEASE PEDAL!
             </div>
 
-            <button id="pedal-btn">🚴 HOLD TO PEDAL</button>
+            <button id="pedal-btn" class="pedal-btn">🚴 HOLD TO PEDAL</button>
 
             <div id="delivery-actions">
-              <button id="deliver-btn" disabled>Deliver!</button>
-              <button id="boost-btn">🚀 Boost</button>
+              <button id="deliver-btn" class="btn-primary btn-block" disabled>Deliver!</button>
+              <button id="boost-btn" class="btn-secondary btn-block">🚀 Boost</button>
             </div>
           </div>
 
-          <div id="dialogue-box" class="hidden">
+          <div id="dialogue-box" class="dialogue-box hidden">
             <p id="dialogue-text">...</p>
             <div id="dialogue-choices"></div>
           </div>
-        </div>
+        </section>
 
         <!-- SHOP -->
-        <div id="screen-shop" class="screen hidden">
-          <h1>SHOP</h1>
+        <section id="screen-shop" class="screen hidden" aria-label="Shop">
+          <h1 class="screen-title">SHOP</h1>
           <p id="shop-tips-display">Saved Tips: $0</p>
           <div id="shop-list"></div>
-          <button id="shop-continue-btn">Continue</button>
-        </div>
+          <button id="shop-continue-btn" class="btn-primary btn-large">Continue</button>
+        </section>
 
         <!-- SHIFT COMPLETE -->
-        <div id="screen-shift-complete" class="screen hidden">
+        <section id="screen-shift-complete" class="screen hidden" aria-label="Shift Complete">
           <h1 id="shift-complete-title">SHIFT COMPLETE</h1>
           <p id="algorithm-message-shift" class="algorithm-message">🤖 ...</p>
           <div id="shift-complete-stats">
@@ -144,49 +162,58 @@
           </div>
           <div id="shift-complete-positions"></div>
           <div id="shift-complete-actions">
-            <button id="next-shift-btn">Next Shift</button>
-            <button id="shift-shop-btn">Shop</button>
+            <button id="next-shift-btn" class="btn-primary btn-large">Next Shift</button>
+            <button id="shift-shop-btn" class="btn-secondary">Shop</button>
           </div>
-        </div>
+        </section>
 
         <!-- LOGBOOK -->
-        <div id="screen-logbook" class="screen hidden">
-          <h1>📖 DEACTIVATION LOGBOOK</h1>
+        <section id="screen-logbook" class="screen hidden" aria-label="Deactivation Log">
+          <h1 class="screen-title">📖 DEACTIVATION LOGBOOK</h1>
           <p id="logbook-progress">0 / 0 collected (0%)</p>
           <div id="logbook-list"></div>
-          <button id="logbook-back-btn">Back</button>
-        </div>
+          <button id="logbook-back-btn" class="btn-secondary btn-large">Back</button>
+        </section>
 
         <!-- CONFIG -->
-        <div id="screen-config" class="screen hidden">
-          <h1>⚙️ CONFIG</h1>
+        <section id="screen-config" class="screen hidden" aria-label="Config">
+          <h1 class="screen-title">⚙️ CONFIG</h1>
 
           <div id="config-options">
-            <button id="config-sound-btn">🔊 Sound: ON</button>
-            <button id="config-vibration-btn">📳 Vibration: ON</button>
+            <button id="config-sound-btn" class="config-btn">🔊 Sound: ON</button>
+            <button id="config-vibration-btn" class="config-btn">📳 Vibration: ON</button>
           </div>
 
           <div id="config-danger-zone">
             <p class="danger-label">DANGER ZONE</p>
             <div id="wipe-root">
-              <button id="wipe-btn">🗑 Wipe Data</button>
+              <button id="wipe-btn" class="btn-danger">🗑 Wipe Data</button>
               <div id="wipe-stage"></div>
             </div>
           </div>
 
-          <button id="config-back-btn">Back</button>
-        </div>
+          <button id="config-back-btn" class="btn-secondary btn-large">Back</button>
+        </section>
 
         <!-- DEACTIVATED -->
-        <div id="screen-deactivated" class="screen hidden">
+        <section id="screen-deactivated" class="screen hidden" aria-label="Deactivated">
           <h1 id="deactivated-title">DEACTIVATED</h1>
           <p id="deactivated-reason">Reason: #000</p>
           <p id="deactivated-text">Placeholder reason text...</p>
           <p id="algorithm-message-death" class="algorithm-message">🤖 ...</p>
-          <button id="restart-btn">Go to Shop</button>
+          <button id="restart-btn" class="btn-primary btn-large">Go to Shop</button>
+        </section>
+
+        <!-- Loading overlay (hidden by default) -->
+        <div id="loading-overlay" class="loading-overlay hidden">
+          <div class="spinner"></div>
+          <p>Loading...</p>
         </div>
+
       </div>
     </div>
+
+    <div id="toast-container"></div>
 
     <script type="module" src="main.js"></script>
   </body>

@@ -1,12 +1,24 @@
 :root {
-    /* Cores solicitadas (Grays escuros e Lime Green) */
-    --bg-main: #0c0c0e;
-    --bg-container: #16161a;
-    --bg-box: #222227;
-    --lime-green: #39ff14;
-    --text-white: #ffffff;
-    --text-muted: #787880;
+  /* Cores do tema */
+  --bg-main: #0c0c0e;
+  --bg-container: #16161a;
+  --bg-box: #222227;
+  --bg-hover: #2a2a3e;
+  --lime-green: #39ff14;
+  --lime-green-dark: #2a8a00;
+  --text-white: #ffffff;
+  --text-muted: #787880;
+  --text-muted-2: #444455;
 
-    /* Tipografia */
-    --font-pixel: 'Press Start 2P', monospace;
+  /* Tipografia */
+  --font-pixel: 'Press Start 2P', monospace;
+
+  /* Sombra (mobile-first) */
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.35);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.45);
+  --shadow-lg: 0 8px 28px rgba(0,0,0,0.55);
+
+  /* Transições */
+  --transition-fast: 0.12s ease-out;
+  --transition-normal: 0.25s ease-out;
 }
