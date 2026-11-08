@@ -6,6 +6,7 @@ import { clamp } from '../utils/math.js';
 import { SFX } from './AudioManager.js';
 import { addBikeWear, WEAR_PER_HIT } from './OrderManager.js';
 import { getHazardScaling } from '../data/difficultyScaling.js';
+import { setIncomingHazard, clearIncomingHazard } from './RideScene.js';
 
 // ---- DOM ----
 const hazardBanner  = document.getElementById("hazard-banner");
@@ -83,6 +84,7 @@ function dodgeHazard() {
     currentHazard = null;
     hazardTimeLeft = 0;
     hideHazardBanner();
+    clearIncomingHazard();
     nextHazardIn = SPAWN_INTERVAL_MIN + Math.random() * (SPAWN_INTERVAL_MAX - SPAWN_INTERVAL_MIN);
 }
 
@@ -94,6 +96,7 @@ function spawnHazard() {
     hazardName.textContent = currentHazard.name;
     hazardTimer.textContent = `${hazardTimeLeft.toFixed(1)}s`;
     hazardBanner.classList.remove("hidden");
+    setIncomingHazard(currentHazard);
     SFX.carHorn();
 }
 
@@ -125,6 +128,7 @@ function resolveHazardHit() {
     currentHazard = null;
     hazardTimeLeft = 0;
     hideHazardBanner();
+    clearIncomingHazard();
     nextHazardIn = SPAWN_INTERVAL_MIN + Math.random() * (SPAWN_INTERVAL_MAX - SPAWN_INTERVAL_MIN);
 }
 

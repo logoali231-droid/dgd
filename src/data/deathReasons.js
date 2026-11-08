@@ -1,16 +1,30 @@
 /**
  * Every way the Algorithm can deactivate you.
  *
- * baseSurvival  — starting survival chance (0.0–1.0). Higher = you were
- *                 already partially protected from day 1.
- * growthPerDeath — how much survival increases each time you die to it.
- * maxSurvival   — hard cap. At 1.0, this reason can never kill you again.
+ * Three families:
+ *
+ *   condition  — fires when a stat crosses the line. Rolled on a cooldown
+ *                (a "close call"), never per-frame. If you survive the roll
+ *                you get a temporary grace so the same line can't be
+ *                hammered against you 60 times a second.
+ *
+ *   choice     — no roll. Always fatal. Reserved for dialogue traps and
+ *                for quitting early.
+ *
+ *   random     — PENALTY EVENTS, not instakills. A random event fires on a
+ *                timer; each one carries effects (energy, battery, cash,
+ *                stress...) and an optional death reason it *can* escalate
+ *                to. The Algorithm's wrath chips at you, and only kills you
+ *                when it catches you already on the floor.
+ *
+ * baseSurvival    — starting survival chance (0.0–1.0).
+ * growthPerDeath  — how much survival increases each time you die to it.
+ * maxSurvival     — hard cap. At 1.0, this reason can never kill you again.
  */
 
 export const DEATH_REASONS = [
   // ================================================================
   //  CONDITION-BASED
-  //  Fires when the condition is met. Rolled once per "close call."
   // ================================================================
   {
     id: "rating_zero",
@@ -52,7 +66,6 @@ export const DEATH_REASONS = [
     condition: (s) => s.lastDelivery && s.lastDelivery.wasCold,
     text: "You delivered cold food. The customer filed a formal complaint with photographic evidence. Deactivated.",
   },
-
   {
     id: "three_red_lights",
     type: "condition",
@@ -94,143 +107,147 @@ export const DEATH_REASONS = [
     maxSurvival: 0.0,
     text: "You declined a surge-price order during peak hours. The Algorithm took that personally.",
   },
+];
 
-  // ================================================================
-  //  RANDOM EVENTS
-  //  Rolled periodically during the shift. Base survival reflects
-  //  how external/uncontrollable each reason is.
-  // ================================================================
+/**
+ * Random penalty events. Each fires on the Algorithm's own timer.
+ *
+ *   weight   — relative chance of being the event that fires
+ *   minShift — earliest shift number (career streak) it can appear
+ *   effects  — applied to state when the event fires
+ *   deathId  — the logbook reason this event can escalate into
+ *   killWhen — predicate: does the event *finish you off* right now?
+ *              (these are the conditions that make the event lethal)
+ *   surviveText — flavour shown when the event hits but doesn't kill
+ */
+export const RANDOM_EVENTS = [
   {
-    id: "random_company_bankrupt",
-    type: "random",
-    category: "algorithm",
-    baseChance: 0.03,
-    baseSurvival: 0.15,
-    growthPerDeath: 0.15,
-    maxSurvival: 1.0,
-    text: "The delivery platform went bankrupt mid-shift. All couriers deactivated.",
+    id: "audit",
+    weight: 16,
+    minShift: 0,
+    effects: { rating: -0.25 },
+    deathId: "random_negative_nancy",
+    killWhen: (s) => s.rating <= 0,
+    surviveText: "AUDIT: metrics reviewed. Rating -0.25. Corrective action logged.",
   },
   {
-    id: "random_got_two_jobs",
-    type: "random",
-    category: "algorithm",
-    baseChance: 0.04,
-    baseSurvival: 0.1,
-    growthPerDeath: 0.1,
-    maxSurvival: 1.0,
-    text: "The Algorithm detected you were running another delivery app simultaneously. Deactivated for 'conflict of interest.'",
+    id: "surge_temptation",
+    weight: 14,
+    minShift: 0,
+    effects: { energy: -12, cash: 20 },
+    deathId: "random_got_two_jobs",
+    killWhen: (s) => s.energy <= 0,
+    surviveText: "PEAK PAY: you took the surge. +$20, but your legs are gone.",
   },
   {
-    id: "random_work_mistake",
-    type: "random",
-    category: "food",
-    baseChance: 0.05,
-    baseSurvival: 0.0,
-    growthPerDeath: 0.1,
-    maxSurvival: 1.0,
-    text: "A work mistake on your end. A taco was missing. The Algorithm doesn't do retries.",
+    id: "complaint_wave",
+    weight: 13,
+    minShift: 0,
+    effects: { rating: -0.3 },
+    deathId: "random_negative_nancy",
+    killWhen: (s) => s.rating <= 0,
+    surviveText: "COMPLAINT WAVE: three customers filed at once. Rating -0.3.",
   },
   {
-    id: "random_screenshot",
-    type: "random",
-    category: "algorithm",
-    baseChance: 0.03,
-    baseSurvival: 0.2,
-    growthPerDeath: 0.1,
-    maxSurvival: 1.0,
-    text: "You took a screenshot of the app. The Algorithm flagged it as a 'security leak.' Deactivated.",
+    id: "app_update",
+    weight: 11,
+    minShift: 1,
+    effects: { battery: -15 },
+    deathId: "battery_zero_before_shift",
+    killWhen: (s) => s.battery <= 0,
+    surviveText: "APP UPDATE: forced install mid-shift. Battery -15%.",
   },
   {
-    id: "random_left_early",
-    type: "random",
-    category: "quitting",
-    baseChance: 0.06,
-    baseSurvival: 0.0,
-    growthPerDeath: 0.1,
-    maxSurvival: 1.0,
-    text: "You closed the app mid-delivery. The Algorithm assumed you abandoned the shift.",
+    id: "gps_outage",
+    weight: 10,
+    minShift: 1,
+    effects: { battery: -10, energy: -6 },
+    deathId: "random_left_early",
+    killWhen: (s) => s.battery <= 0,
+    surviveText: "GPS OUTAGE: you circled for two minutes. Battery -10%, energy -6.",
   },
   {
-    id: "random_sudden_strike",
-    type: "random",
-    category: "customer",
-    baseChance: 0.04,
-    baseSurvival: 0.2,
-    growthPerDeath: 0.15,
-    maxSurvival: 1.0,
-    text: "A sudden strike at the restaurant. All orders cancelled. The Algorithm blamed you for the disruption.",
+    id: "dog_attack",
+    weight: 9,
+    minShift: 0,
+    effects: { energy: -14, rating: -0.15 },
+    deathId: "random_dog_attack",
+    killWhen: (s) => s.energy <= 0,
+    surviveText: "STRAY DOG: it got the bag. You got away. Energy -14, rating -0.15.",
   },
   {
-    id: "random_dog_attack",
-    type: "random",
-    category: "physical",
-    baseChance: 0.05,
-    baseSurvival: 0.05,
-    growthPerDeath: 0.1,
-    maxSurvival: 1.0,
-    text: "A stray dog attacked you mid-delivery. Food scattered. You were deactivated for 'failure to secure cargo.'",
+    id: "car_door",
+    weight: 9,
+    minShift: 0,
+    effects: { energy: -16, cash: -10 },
+    deathId: "random_car_door",
+    killWhen: (s) => s.energy <= 0,
+    surviveText: "CAR DOOR: you swerved into a bollard. Energy -16, repair -$10.",
   },
   {
-    id: "random_car_door",
-    type: "random",
-    category: "physical",
-    baseChance: 0.05,
-    baseSurvival: 0.05,
-    growthPerDeath: 0.1,
-    maxSurvival: 1.0,
-    text: "A parked car door swung open. You swerved. The food didn't survive. Neither did your rating.",
+    id: "pothole_spill",
+    weight: 8,
+    minShift: 0,
+    effects: { rating: -0.2 },
+    deathId: "random_pothole",
+    killWhen: (s) => s.rating <= 0,
+    surviveText: "POTHOLE: lid popped off. Rating -0.2.",
   },
   {
-    id: "random_pothole",
-    type: "random",
-    category: "physical",
-    baseChance: 0.04,
-    baseSurvival: 0.05,
-    growthPerDeath: 0.1,
-    maxSurvival: 1.0,
-    text: "You hit a pothole at full speed. The drink lid popped off. The Algorithm saw everything via GPS telemetry.",
+    id: "restaurant_strike",
+    weight: 7,
+    minShift: 2,
+    effects: { energy: -8, rating: -0.1 },
+    deathId: "random_sudden_strike",
+    killWhen: (s) => s.energy <= 0,
+    surviveText: "STRIKE: the kitchen walked out. You waited in the cold. Energy -8.",
   },
   {
-    id: "random_negative_nancy",
-    type: "random",
-    category: "customer",
-    baseChance: 0.03,
-    baseSurvival: 0.0,
-    growthPerDeath: 0.1,
-    maxSurvival: 1.0,
-    text: "You replied negatively to five customer messages in a row. The Algorithm's sentiment analysis flagged you as a 'risk.'",
+    id: "screenshot_flag",
+    weight: 6,
+    minShift: 3,
+    effects: { rating: -0.35 },
+    deathId: "random_screenshot",
+    killWhen: (s) => s.rating <= 0,
+    surviveText: "SECURITY: you screenshotted the app. Rating -0.35.",
+  },
+  {
+    id: "surprise_termination",
+    weight: 5,
+    minShift: 4,
+    effects: { rating: -0.2 },
+    deathId: "random_company_bankrupt",
+    killWhen: (s) => s.rating < 2.0,
+    surviveText: "RESTRUCTURING: your region was 'consolidated.' You survived by luck.",
   },
 
-  // ---- Absurd / Easter Eggs ----
+  // ---- Absurd / Easter eggs -------------------------------------
+  {
+    id: "absurd_cat",
+    weight: 2,
+    minShift: 0,
+    effects: { rating: -0.1, energy: 5 },
+    deathId: "absurd_cat",
+    killWhen: () => false,
+    surviveText: "You paused to pet a cat. Rating -0.1. Worth it.",
+  },
   {
     id: "absurd_robot",
-    type: "random",
-    category: "absurd",
-    baseChance: 0.005,
-    baseSurvival: 0.3,
-    growthPerDeath: 0.15,
-    maxSurvival: 1.0,
-    text: "You delivered food so perfectly the customer suspected you were a robot. Reported you. Deactivated.",
+    weight: 1,
+    minShift: 5,
+    effects: {},
+    deathId: "absurd_robot",
+    killWhen: () => false,
+    surviveText: "A customer squinted at you. 'You're not a robot, are you?'",
   },
   {
     id: "absurd_reflection",
-    type: "random",
-    category: "absurd",
-    baseChance: 0.005,
-    baseSurvival: 0.3,
-    growthPerDeath: 0.15,
-    maxSurvival: 1.0,
-    text: "You saw your own reflection in a shop window. Algorithm flagged 'two accounts, one device.'",
-  },
-  {
-    id: "absurd_cat",
-    type: "random",
-    category: "absurd",
-    baseChance: 0.005,
-    baseSurvival: 0.3,
-    growthPerDeath: 0.15,
-    maxSurvival: 1.0,
-    text: "You paused to pet a cat. The Algorithm flagged 'fraternizing with non-customers.'",
+    weight: 1,
+    minShift: 5,
+    effects: {},
+    deathId: "absurd_reflection",
+    killWhen: () => false,
+    surviveText: "You caught your reflection in a shop window. It looked tired.",
   },
 ];
 
@@ -246,8 +263,7 @@ export function buildDefaultSurvivalMap() {
 }
 
 // ================================================================
-//  HELPER — pick a random condition that can be rolled this frame
-//  (returns null if nothing to check)
+//  HELPER — pick the first condition currently being violated
 // ================================================================
 export function getActiveCondition(state) {
   for (const reason of DEATH_REASONS) {
@@ -258,16 +274,24 @@ export function getActiveCondition(state) {
 }
 
 // ================================================================
-//  HELPER — roll every random reason once
+//  HELPER — pick a random penalty event appropriate to this career
 // ================================================================
-export function rollRandomEvent(survivalMap = {}) {
-  for (const reason of DEATH_REASONS) {
-    if (reason.type !== "random") continue;
-    const survival = survivalMap[reason.id] ?? reason.baseSurvival ?? 0;
-    const adjustedChance = reason.baseChance * (1 - survival);
-    if (Math.random() < adjustedChance) return reason;
+export function pickRandomEvent(streak = 0) {
+  const pool = RANDOM_EVENTS.filter((e) => (e.minShift ?? 0) <= streak);
+  const totalWeight = pool.reduce((sum, e) => sum + (e.weight || 1), 0);
+  let roll = Math.random() * totalWeight;
+  for (const e of pool) {
+    roll -= e.weight || 1;
+    if (roll <= 0) return e;
   }
-  return null;
+  return pool[pool.length - 1] || null;
+}
+
+// ================================================================
+//  HELPER — find a death reason by id (any type)
+// ================================================================
+export function getReasonById(id) {
+  return DEATH_REASONS.find((r) => r.id === id) || null;
 }
 
 // ================================================================

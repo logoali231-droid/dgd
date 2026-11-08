@@ -42,3 +42,74 @@ You are a courier for an unnamed delivery platform. Your shift lasts 12 in-game 
 2. **You get deactivated** — the Algorithm flags you for something, and a new entry goes in your Deactivation Logbook. Every death teaches you something, and every repeat death increases your survival chance against that specific reason.
 
 ### Core Loop
+
+```
+ORDER QUEUE → ACCEPT/DECLINE → RIDE (hold pedal, dodge hazards)
+     → ARRIVAL (knock / call / text / leave at door)
+     → RATING + TIP → next order …
+     → SHIFT END (survive) or DEACTIVATION (logbook entry)
+```
+
+1. **Order queue** — an order card appears with the food, the customer
+   archetype, the neighborhood, and the pay. You have a few seconds to
+   accept or decline (the window shrinks as the Algorithm gets stricter).
+2. **Ride** — hold the pedal to fill the progress bar. Release to brake for
+   hazards (potholes, car doors, stray dogs, red lights). Endurance drains
+   while you pedal and recovers while you coast. Boost once per delivery.
+3. **Arrival** — at the door you choose *how* to hand the food over. Every
+   option is a trade-off: knocking is safe but slow, calling costs battery,
+   texting is slow, leaving at the door is instant but can be stolen.
+4. **Rating & tip** — on-time deliveries pay full; cold food pays less and
+   costs rating. Customer archetypes and your arrival choice both move the
+   needle.
+5. **Shift end** — survive all 12 in-game hours for cash, saved tips, and a
+   chance at a hidden position. Or get deactivated and log the reason.
+
+### Systems
+
+| System | File | Responsibility |
+|--------|------|----------------|
+| Game loop | `src/core/GameLoop.js` | Delta-time tick, phase music, drain, end-of-shift |
+| State | `src/core/State.js` | Single source of truth + save/load |
+| Orders | `src/systems/OrderManager.js` | Spawn, accept/decline, pedal, delivery resolution |
+| Ride scene | `src/systems/RideScene.js` | Canvas navigation view (road, courier, hazards) |
+| Arrival | `src/systems/ArrivalSystem.js` | The door mini-game |
+| Hazards | `src/systems/HazardSystem.js` | Hazard spawns, red lights, brake-to-dodge |
+| Deactivation | `src/systems/DeactivationSystem.js` | Condition rolls + the Algorithm's penalty events |
+| Positions | `src/systems/PositionTracker.js` | Hidden-position unlocks and their effects |
+| Upgrades | `src/systems/UpgradeSystem.js` | Meta-progression purchases and their effects |
+| Audio | `src/systems/AudioManager.js` | SFX + phase-driven music |
+
+### The Algorithm's penalty events
+
+The Algorithm no longer kills you at random. Instead it fires **penalty
+events** on a timer (an audit, a surge temptation, a complaint wave, an app
+update, a stray dog…). Each event chips at your energy, battery, cash, or
+rating — and only *finishes you off* when it catches you already on the
+floor. Survive the hit and you keep riding.
+
+### Deactivation conditions
+
+Stat lines (rating 0, energy 0, battery 0, cold food, three red lights) are
+rolled **once per close call**, not every frame, and each reason you survive
+goes on a short cooldown. Every death to a reason permanently raises your
+survival chance against it — the Logbook is your progress bar.
+
+### Running it
+
+No build step. It is plain ES modules, so serve the folder over HTTP:
+
+```bash
+python3 -m http.server 8099
+# then open http://localhost:8099/index.html
+```
+
+(Opening `index.html` directly from the filesystem will not work — ES module
+imports need an HTTP origin.)
+
+### Assets
+
+`assets/sprites/` and `assets/audio/` are intentionally empty placeholders.
+Every sprite and sound is declared in `src/assets.js` and every consumer
+falls back gracefully (emoji for sprites, silence for audio), so the game is
+fully playable before any art lands. Drop real files in and they light up.

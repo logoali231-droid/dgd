@@ -110,6 +110,7 @@ export function resetShiftCounters() {
   state.deliveriesThisShift = 0;
   state.shiftElapsedRealSeconds = 0;
   state.currentDelivery = null;
+  state.lastDelivery = null;
   state.currentShiftWasPerfect = true;
   state.shiftCoffeeUsed = false;
   state.shiftPowerBankUsed = false;

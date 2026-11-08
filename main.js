@@ -1,4 +1,4 @@
-import { startGameLoop } from './src/core/GameLoop.js';
+import { startGameLoop, stopGameLoop } from './src/core/GameLoop.js';
 import { state, resetShiftCounters } from './src/core/State.js';
 import { showGame, showStart, showShop, showConfig } from './src/ui/ScreenManager.js';
 import { resetOrderManager } from './src/systems/OrderManager.js';
@@ -9,7 +9,10 @@ import { useCoffee, usePowerBank } from './src/systems/ConsumablesSystem.js';
 import { snapshotPositions } from './src/ui/ShiftCompleteUI.js';
 import { showLogbook } from './src/ui/ScreenManager.js';
 import { renderLogbook } from './src/ui/LogbookUI.js';
-import { unlockAudio, SFX } from './src/systems/AudioManager.js';
+import { unlockAudio, SFX, stopMusic } from './src/systems/AudioManager.js';
+import { initRideScene } from './src/systems/RideScene.js';
+import { resetArrivalSystem } from './src/systems/ArrivalSystem.js';
+import { triggerChoiceDeactivation } from './src/systems/DeactivationSystem.js';
 import { preloadSprites, ASSETS } from './src/assets.js';
 import { renderCareerHub } from './src/ui/CareerHubUI.js';
 import { renderConfig, bindConfigListeners } from './src/ui/ConfigUI.js';
@@ -38,6 +41,7 @@ const logbookBackBtn   = document.getElementById("logbook-back-btn");
 const shopStartBtn     = document.getElementById("shop-start-btn");
 const configBtn        = document.getElementById("config-btn");
 const configBackBtn    = document.getElementById("config-back-btn");
+const endShiftBtn      = document.getElementById("end-shift-btn");
 
 // ---- HUB HELPER ----
 function goToHub() {
@@ -77,6 +81,7 @@ startButton.addEventListener("click", () => {
     unlockAudio();
     resetRun();
     resetShiftCounters();
+    resetArrivalSystem();
     snapshotPositions();
     refreshConsumableBar();
     showGame();
@@ -87,9 +92,39 @@ startButton.addEventListener("click", () => {
 nextShiftBtn.addEventListener("click", () => {
     startNextShift();
     resetShiftCounters();
+    resetArrivalSystem();
     refreshConsumableBar();
     showGame();
     startGameLoop();
+});
+
+// ---- END SHIFT EARLY (two-step confirm) ----
+let endShiftArmed = false;
+let endShiftTimer = null;
+
+function disarmEndShift() {
+    endShiftArmed = false;
+    endShiftBtn.textContent = "🚪 End Shift Early";
+    endShiftBtn.classList.remove("armed");
+}
+
+endShiftBtn.addEventListener("click", () => {
+    if (!state.isPlaying) return;
+
+    if (!endShiftArmed) {
+        endShiftArmed = true;
+        endShiftBtn.textContent = "⚠️ Confirm End Shift";
+        endShiftBtn.classList.add("armed");
+        endShiftTimer = setTimeout(disarmEndShift, 3000);
+        return;
+    }
+
+    clearTimeout(endShiftTimer);
+    disarmEndShift();
+    // Fire the deactivation FIRST — it flips isPlaying and stops the loop.
+    triggerChoiceDeactivation("quit_early_menu");
+    stopGameLoop();
+    stopMusic();
 });
 
 // ---- SHOP NAV ----
@@ -117,5 +152,6 @@ configBackBtn.addEventListener("click", goToHub);
 bindConfigListeners();
 
 // ---- INITIAL RENDER ----
+initRideScene();
 refreshConsumableBar();
 goToHub();

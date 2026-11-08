@@ -1,4 +1,5 @@
 import { state } from "../core/State.js";
+import { CONFIG } from "../data/config.js";
 import { randomInt, formatCurrency, clamp } from "../utils/math.js";
 import { getRandomFood } from "../data/food.js";
 import { getRandomNeighborhood } from "../data/neighborhoods.js";
@@ -15,6 +16,9 @@ import {
   getPayScaling,
 } from "../data/difficultyScaling.js";
 import { getRandomCustomerType } from "../data/customerTypes.js";
+import { getUpgradeEffect, getMaxEnergy, getMaxBattery } from "./UpgradeSystem.js";
+import { beginArrival, resetArrivalSystem } from "./ArrivalSystem.js";
+import { startRide, stopRide, updateRide } from "./RideScene.js";
 
 // ---- DOM ----
 const orderCard = document.getElementById("order-card");
@@ -42,7 +46,6 @@ const enduranceFill = document.getElementById("endurance-fill");
 const enduranceText = document.getElementById("endurance-text");
 
 // ---- CONFIG ----
-const ORDER_DECISION_TIME = 6;
 const BOOST_DURATION = 5.0;
 const BASE_PEDAL_RATE = 40; // progress units per second
 const ENDURANCE_DRAIN = 18; // per second while holding
@@ -56,6 +59,7 @@ let orderTimeLeft = 0;
 let nextOrderIn = 3;
 let lastFoodId = null;
 let bikeWear = 0; // 0.0 = fresh bike, each hazard hit adds 0.08
+let arrivalActive = false;
 
 // ---- RESTAURANTS ----
 const RESTAURANTS = [
@@ -108,11 +112,10 @@ function spawnOrder() {
   if (state.currentDelivery !== null) return;
   resetHazards();
 
-  const decisionTime = getDecisionTimeScaling(state.shiftsSurvived);
-  orderTimeLeft = decisionTime;
+  // Decision time shrinks as the Algorithm gets stricter.
+  orderTimeLeft = getDecisionTimeScaling(state.shiftsSurvived);
 
   currentOrder = generateOrder();
-  orderTimeLeft = ORDER_DECISION_TIME;
 
   foodEl.textContent = `${currentOrder.food.emoji} ${currentOrder.food.name} (cold in ~${currentOrder.food.coldTime}s)`;
   restaurantEl.textContent = currentOrder.restaurant;
@@ -139,6 +142,7 @@ function dismissOrder() {
 function setPedalHeld(held) {
   const d = state.currentDelivery;
   if (!d) return;
+  if (arrivalActive) return;
   if (state.pedalStallTime > 0) return; // stalled
   if (!held && state.pedalEndurance <= 0) return; // can't restart empty
   if (held && d.progress >= d.distance) return; // already done
@@ -181,11 +185,11 @@ function updateDeliveryUI() {
       ? `STALLED — ${state.pedalStallTime.toFixed(1)}s`
       : `Endurance ${Math.round(state.pedalEndurance)}%`;
 
-  deliverBtn.disabled = d.progress < d.distance;
+  deliverBtn.disabled = d.progress < d.distance || arrivalActive;
 
   // Pedal button visual state
   pedalBtn.classList.toggle("stalled", state.pedalStallTime > 0);
-  pedalBtn.disabled = state.pedalStallTime > 0;
+  pedalBtn.disabled = state.pedalStallTime > 0 || arrivalActive;
 
   updateBoostButton();
 }
@@ -212,16 +216,20 @@ function updateBoostButton() {
 function handleAccept() {
   if (!currentOrder) return;
 
+  // Insulated-bag style upgrades stretch the cold timer.
+  const coldReduction = getUpgradeEffect("coldTimeReduction");
+  const baseCold = currentOrder.food.coldTime * currentOrder.customerType.coldTimeMult;
+  const coldTime = Math.round(baseCold * (1 + coldReduction));
+
   state.currentDelivery = {
     food: currentOrder.food,
     restaurant: currentOrder.restaurant,
     neighborhood: currentOrder.neighborhood,
     customerName: currentOrder.customerName,
+    customerType: currentOrder.customerType,
     payAmount: currentOrder.payAmount,
-    timeLeft: Math.round(
-      currentOrder.food.coldTime * currentOrder.customerType.coldTimeMult,
-    ),
-    totalTime: currentOrder.food.coldTime,
+    timeLeft: coldTime,
+    totalTime: coldTime,
     progress: 0,
     distance: currentOrder.neighborhood.progress,
   };
@@ -232,6 +240,7 @@ function handleAccept() {
   state.boostActive = false;
   state.boostTimeLeft = 0;
   state.boostUsedThisDelivery = false;
+  arrivalActive = false;
 
   resetHazards();
   dismissOrder();
@@ -240,6 +249,7 @@ function handleAccept() {
   deliveryPanel.classList.remove("hidden");
   pedalBtn.textContent = "🚴 HOLD TO PEDAL";
   pedalBtn.classList.remove("pedaling", "stalled");
+  startRide();
   updateDeliveryUI();
   statusTextEl.textContent = "Hold PEDAL. Release to brake for hazards.";
 }
@@ -254,6 +264,24 @@ function handleDeliver() {
   const d = state.currentDelivery;
   if (!d) return;
   if (d.progress < d.distance) return;
+  if (arrivalActive) return;
+
+  // Freeze the ride and open the arrival mini-game.
+  arrivalActive = true;
+  state.pedalHeld = false;
+  pedalBtn.classList.remove("pedaling");
+  stopRide();
+  updateDeliveryUI();
+
+  beginArrival(d, resolveDelivery);
+}
+
+/**
+ * Called by ArrivalSystem once the player has chosen how to hand the food over.
+ */
+function resolveDelivery(arrival) {
+  const d = state.currentDelivery;
+  if (!d) return;
 
   const archetype = d.customerType || {
     id: "polite",
@@ -268,9 +296,14 @@ function handleDeliver() {
     complaintChance: 0,
   };
 
+  // The arrival choice nudges the clock (knocking costs time, leaving early saves it).
+  d.timeLeft -= arrival.timeCost || 0;
+
+  const wasCold = d.timeLeft <= 0;
+
   let earned, ratingDelta, message;
 
-  if (d.timeLeft > 0) {
+  if (!wasCold) {
     earned = d.payAmount;
     ratingDelta = archetype.ratingOnTime;
     message = "On time!";
@@ -282,9 +315,18 @@ function handleDeliver() {
     message = `Late by ${Math.round(lateness)}s.`;
   }
 
+  // ---- Arrival outcome ----
+  ratingDelta += arrival.ratingDelta || 0;
+  earned = Math.round(earned * (arrival.tipMult ?? 1));
+  if (arrival.stolen) {
+    earned = 0;
+    message = "Order stolen!";
+  }
+
   // ---- Bonus tip roll ----
   let bonusTip = 0;
   if (
+    !arrival.stolen &&
     archetype.bonusTipChance > 0 &&
     Math.random() < archetype.bonusTipChance
   ) {
@@ -295,6 +337,7 @@ function handleDeliver() {
   // ---- Complaint roll ----
   let complaint = false;
   if (
+    !arrival.stolen &&
     archetype.complaintChance > 0 &&
     Math.random() < archetype.complaintChance
   ) {
@@ -302,7 +345,11 @@ function handleDeliver() {
     ratingDelta -= 0.3;
   }
 
-  // ---- Position effects (unchanged) ----
+  // ---- Upgrade effects ----
+  const cashBonus = getUpgradeEffect("cashMultiplierBonus");
+  if (cashBonus > 0) earned = Math.round(earned * (1 + cashBonus));
+
+  // ---- Position effects ----
   const cashMult = getActiveEffect("cashMultiplier");
   if (cashMult !== null) earned = Math.round(earned * cashMult);
 
@@ -316,11 +363,23 @@ function handleDeliver() {
 
   // ---- Apply to state ----
   state.cash += earned;
-  SFX.cashRegister();
+  if (earned > 0) SFX.cashRegister();
   state.rating = clamp(state.rating + ratingDelta, 0, 5);
   state.deliveriesThisShift += 1;
   state.streakStats.deliveries += 1;
   if (ratingDelta < 0) state.currentShiftWasPerfect = false;
+
+  // A completed delivery buys you a bite and a charge.
+  state.energy = clamp(state.energy + CONFIG.DELIVERY_ENERGY_RESTORE, 0, getMaxEnergy());
+  state.battery = clamp(state.battery + CONFIG.DELIVERY_BATTERY_RESTORE, 0, getMaxBattery());
+
+  // ---- Record for the cold-food condition ----
+  state.lastDelivery = {
+    wasCold,
+    stolen: arrival.stolen,
+    ratingDelta,
+    earned,
+  };
 
   // ---- Build status message ----
   const ratingText =
@@ -333,13 +392,16 @@ function handleDeliver() {
 
   updatePositions();
 
+  // ---- Tear down ----
   state.currentDelivery = null;
   state.pedalHeld = false;
   state.boostActive = false;
   state.boostTimeLeft = 0;
   state.boostUsedThisDelivery = false;
+  arrivalActive = false;
   deliveryPanel.classList.add("hidden");
   resetHazards();
+  stopRide();
   nextOrderIn = 3;
 }
 
@@ -355,9 +417,15 @@ function handleBoost() {
   updateBoostButton();
 }
 
-// ---- PEDAL LISTENERS (mouse + touch + keyboard) ----
+// ---- PEDAL LISTENERS (pointer + keyboard) ----
+// Pointer capture keeps the hold alive even if the button shifts under the
+// cursor mid-press (the HUD re-renders every frame), which a plain
+// mousedown/mouseleave pair would cancel.
 function pedalDown(e) {
   if (e) e.preventDefault();
+  if (e && e.pointerId !== undefined && pedalBtn.setPointerCapture) {
+    try { pedalBtn.setPointerCapture(e.pointerId); } catch (_) { /* ignore */ }
+  }
   setPedalHeld(true);
 }
 function pedalUp(e) {
@@ -365,9 +433,12 @@ function pedalUp(e) {
   setPedalHeld(false);
 }
 
+pedalBtn.addEventListener("pointerdown", pedalDown);
+pedalBtn.addEventListener("pointerup", pedalUp);
+pedalBtn.addEventListener("pointercancel", pedalUp);
+// Fallback for browsers without pointer events
 pedalBtn.addEventListener("mousedown", pedalDown);
 pedalBtn.addEventListener("mouseup", pedalUp);
-pedalBtn.addEventListener("mouseleave", pedalUp);
 pedalBtn.addEventListener("touchstart", pedalDown, { passive: false });
 pedalBtn.addEventListener("touchend", pedalUp, { passive: false });
 pedalBtn.addEventListener("touchcancel", pedalUp, { passive: false });
@@ -396,6 +467,12 @@ export function updateOrderManager(deltaTime) {
   // ---- ACTIVE DELIVERY ----
   if (state.currentDelivery) {
     const d = state.currentDelivery;
+
+    // While the arrival mini-game is open, the ride is frozen.
+    if (arrivalActive) {
+      updateDeliveryUI();
+      return;
+    }
 
     // Stall timer
     if (state.pedalStallTime > 0) {
@@ -431,10 +508,12 @@ export function updateOrderManager(deltaTime) {
         state.pedalStallTime = STALL_PENALTY;
         notifyPedalReleased();
       } else {
-        // Progress fills — slower with wear, faster with boost
+        // Progress fills — slower with wear, faster with boost and upgrades
         const wearMult = 1 - bikeWear;
         const boostMult = state.boostActive ? 2 : 1;
-        d.progress += BASE_PEDAL_RATE * wearMult * boostMult * deltaTime;
+        const posSpeed = getActiveEffect("deliverySpeedMultiplier");
+        const speedMult = posSpeed !== null ? posSpeed : 1;
+        d.progress += BASE_PEDAL_RATE * wearMult * boostMult * speedMult * deltaTime;
         if (d.progress > d.distance) d.progress = d.distance;
       }
     } else if (!state.pedalHeld) {
@@ -451,6 +530,10 @@ export function updateOrderManager(deltaTime) {
 
     updateHazardSystem(deltaTime);
     updateDeliveryUI();
+
+    // Live ride view
+    const speed = state.pedalHeld ? 1 : 0.15;
+    updateRide(deltaTime, speed);
     return;
   }
 
@@ -488,10 +571,13 @@ export function resetOrderManager() {
   state.boostUsedThisDelivery = false;
   state.deliveriesThisShift = 0;
   bikeWear = 0;
+  arrivalActive = false;
   actionsEl.classList.add("hidden");
   orderCard.classList.add("hidden");
   deliveryPanel.classList.add("hidden");
   resetHazards();
+  resetArrivalSystem();
+  stopRide();
 }
 
 // Expose bike wear to other systems

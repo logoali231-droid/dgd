@@ -17,9 +17,10 @@ export function getDecisionTimeScaling(streak) {
 }
 
 export function getRandomEventInterval(streak) {
-    // Starts at 150s, drops as you survive longer, floors at 90s
-    const reduction = Math.min(streak * 3, 60);
-    return Math.max(150 - reduction, 90);
+    // The Algorithm checks on you every ~45s as a rookie, tightening to
+    // every ~28s once you're a known survivor.
+    const tightening = Math.min(streak * 0.9, 17);
+    return Math.max(45 - tightening, 28);
 }
 
 export function getPayScaling(streak) {

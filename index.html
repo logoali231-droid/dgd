@@ -77,6 +77,8 @@
             </button>
           </div>
 
+          <button id="end-shift-btn">🚪 End Shift Early</button>
+
           <div id="order-card" class="hidden">
             <p id="order-food">🍕 Pizza</p>
             <p id="order-customer-type">🙂 The Polite</p>
@@ -92,6 +94,7 @@
           </div>
 
           <div id="delivery-panel" class="hidden">
+            <canvas id="ride-canvas"></canvas>
             <p id="delivery-food">🍕 Pizza</p>
             <p id="delivery-timer">30s</p>
             <div id="progress-bar"><div id="progress-fill"></div></div>
@@ -116,6 +119,13 @@
               <button id="deliver-btn" disabled>Deliver!</button>
               <button id="boost-btn">🚀 Boost</button>
             </div>
+          </div>
+
+          <div id="arrival-panel" class="hidden">
+            <p id="arrival-title">🙂 The Polite</p>
+            <p id="arrival-sub">You're at the door. How do you hand it over?</p>
+            <div id="arrival-actions"></div>
+            <p id="arrival-result" class="hidden"></p>
           </div>
 
           <div id="dialogue-box" class="hidden">
