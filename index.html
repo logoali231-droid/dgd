@@ -2,15 +2,27 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no"
+    />
     <title>Don't Get Deactivated!</title>
+
+    <!-- PWA / mobile install -->
+    <meta name="theme-color" content="#0c0c0e" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="DGD" />
+    <meta name="description" content="A courier survival game. Don't get deactivated." />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="icon" href="assets/icons/icon-192.png" />
+    <link rel="apple-touch-icon" href="assets/icons/icon-192.png" />
+
     <link rel="stylesheet" href="styles/variables.css" />
     <link rel="stylesheet" href="styles/layout.css" />
     <link rel="stylesheet" href="styles/components.css" />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"
-      rel="stylesheet"
-    />
+    <link rel="stylesheet" href="styles/mobile.css" />
   </head>
   <body>
     <div id="game-container">

@@ -1,0 +1,272 @@
+/* ============================================================
+   mobile.css — device-aware layer
+   ------------------------------------------------------------
+   Loaded AFTER variables/layout/components so it can override.
+   Goals:
+     - Fill the real phone viewport (dvh, safe-area insets)
+     - Touch targets >= 44px, no accidental zoom/select on tap
+     - Landscape phones: side-by-side layout instead of a tall column
+     - Tablets / desktop: keep the phone frame, just scale up
+     - Respect prefers-reduced-motion
+   Nothing here changes game logic — layout and ergonomics only.
+   ============================================================ */
+
+/* ---------- 1. Viewport & safe areas ---------- */
+
+html {
+    /* Stop iOS from inflating text in landscape */
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    height: 100%;
+}
+
+body {
+    /* 100dvh tracks the real visible area as mobile browser chrome
+       slides in/out; 100vh is the fallback for older engines. */
+    height: 100vh;
+    height: 100dvh;
+    min-height: 100vh;
+    min-height: 100dvh;
+    overflow: hidden;
+    overscroll-behavior: none;
+    /* Kill the grey flash on tap and the long-press callout */
+    -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    touch-action: manipulation;
+}
+
+#game-container {
+    height: 100vh;
+    height: 100dvh;
+    max-height: 100vh;
+    max-height: 100dvh;
+    /* Keep content clear of the notch / home indicator */
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    padding-left: env(safe-area-inset-left, 0px);
+    padding-right: env(safe-area-inset-right, 0px);
+    /* The frame border is decorative; drop it on phones where it
+       just eats pixels. */
+    border-width: 0;
+}
+
+/* ---------- 2. Touch ergonomics ---------- */
+
+/* Every interactive control gets a comfortable hit area. */
+button,
+.arrival-btn,
+.shop-item,
+.dialogue-btn,
+.consumable-btn {
+    min-height: 44px;
+    touch-action: manipulation;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+/* Text should never be selectable by accident during a hold. */
+#game-area,
+#hud,
+#positions-bar {
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+/* The pedal is the one control that must never be missed. */
+#pedal-btn {
+    min-height: 64px;
+    font-size: 15px;
+    /* Prevent the browser from treating a long press as a scroll
+       gesture — we need the full press duration. */
+    touch-action: none;
+}
+
+/* Scrollable lists: momentum + contained overscroll so a flick
+   at the end of the shop doesn't bounce the whole page. */
+#game-area,
+#shop-list,
+#logbook-list {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+}
+
+/* ---------- 3. Readability on small screens ---------- */
+
+/* The pixel font is wide; at 8-9px it is unreadable on a phone.
+   Nudge the smallest sizes up without breaking the layout. */
+@media (max-width: 480px) {
+    .label,
+    #endurance-text,
+    #arrival-sub,
+    .shop-item-desc,
+    .logbook-desc {
+        font-size: 9px;
+        line-height: 1.6;
+    }
+
+    #ui-rating, #ui-energy, #ui-battery, #ui-cash, #ui-time {
+        font-size: 11px;
+    }
+
+    #hud {
+        gap: 6px;
+        padding: 8px;
+    }
+
+    .stat-box {
+        min-width: 0;
+        padding: 6px;
+    }
+
+    #game-area {
+        gap: 16px;
+        padding: 14px;
+    }
+
+    .screen {
+        gap: 16px;
+    }
+}
+
+/* Very narrow phones (iPhone SE, 320px) */
+@media (max-width: 360px) {
+    #game-state-text { font-size: 12px; }
+    #pedal-btn { font-size: 13px; }
+    .stat-box { flex: 1 1 calc(50% - 6px); }
+}
+
+/* ---------- 4. Landscape phones ---------- */
+
+/* A 420px-wide column in landscape wastes most of the screen and
+   pushes the pedal below the fold. Switch to a two-column layout:
+   HUD on the left, play area on the right. */
+@media (orientation: landscape) and (max-height: 560px) {
+    #game-container {
+        max-width: 100%;
+        flex-direction: row;
+    }
+
+    #hud {
+        flex: 0 0 168px;
+        flex-direction: column;
+        flex-wrap: nowrap;
+        overflow-y: auto;
+        border-bottom: none;
+        border-right: 2px solid var(--text-muted);
+        padding: 8px;
+        gap: 6px;
+    }
+
+    #hud .stat-box {
+        flex: 0 0 auto;
+        min-width: 0;
+    }
+
+    #phase-bar {
+        flex: 0 0 auto;
+        border-bottom: 2px solid var(--text-muted);
+    }
+
+    #positions-bar {
+        flex: 0 0 auto;
+    }
+
+    #game-area {
+        flex: 1 1 auto;
+        padding: 10px 14px;
+        gap: 10px;
+        justify-content: flex-start;
+    }
+
+    .screen {
+        gap: 10px;
+        justify-content: flex-start;
+    }
+
+    /* Ride canvas is the tallest element — cap it so the pedal
+       stays on screen without scrolling. */
+    #ride-canvas {
+        max-height: 34vh;
+    }
+
+    #pedal-btn {
+        min-height: 52px;
+        padding: 12px;
+    }
+
+    #delivery-panel {
+        gap: 8px;
+        padding: 12px;
+    }
+
+    #hazard-banner {
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        padding: 8px;
+    }
+
+    #hazard-banner #hazard-icon { font-size: 26px; }
+}
+
+/* ---------- 5. Tablets & desktop ---------- */
+
+/* On a big screen the phone frame is the point — keep it, but let
+   it breathe and give the pixel font room. */
+@media (min-width: 900px) and (min-height: 700px) {
+    #game-container {
+        max-width: 460px;
+        max-height: 900px;
+        height: 92vh;
+        height: 92dvh;
+        border-width: 4px;
+        border-radius: 6px;
+        box-shadow: 0 0 0 1px #000, 0 24px 60px rgba(0, 0, 0, 0.6);
+    }
+}
+
+/* Coarse pointer (finger) vs fine pointer (mouse): only show
+   hover affordances where a real hover exists. */
+@media (hover: none) {
+    .shop-item:hover,
+    .arrival-btn:hover,
+    .dialogue-btn:hover {
+        border-color: var(--text-muted);
+    }
+}
+
+/* ---------- 6. Accessibility ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+    #hazard-banner,
+    #strike-banner,
+    #game-container.shake-soft,
+    #game-container.shake-medium,
+    #game-container.shake-hard {
+        animation: none !important;
+    }
+
+    #progress-fill,
+    #endurance-fill,
+    .logbook-survival-fill {
+        transition: none;
+    }
+}
+
+/* Visible focus for keyboard users, invisible for touch. */
+button:focus-visible,
+.arrival-btn:focus-visible,
+.shop-item:focus-visible {
+    outline: 3px solid var(--lime-green);
+    outline-offset: 2px;
+}
+
+/* ---------- 7. Standalone / installed app ---------- */
+
+/* When launched from the home screen there is no browser chrome,
+   so the safe-area padding above is what keeps the HUD visible. */
+@media (display-mode: standalone) {
+    body {
+        background-color: var(--bg-main);
+    }
+}
