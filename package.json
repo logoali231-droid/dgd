@@ -1,0 +1,25 @@
+{
+  "name": "dgd",
+  "version": "1.0.0",
+  "description": "> *\"You're not an employee. You're a line item.\"*",
+  "main": "main.js",
+  "scripts": {
+    "build": "node build/build.mjs",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/logoali231-droid/dgd.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/logoali231-droid/dgd/issues"
+  },
+  "homepage": "https://github.com/logoali231-droid/dgd#readme",
+  "devDependencies": {
+    "esbuild": "^0.28.2"
+  }
+}
