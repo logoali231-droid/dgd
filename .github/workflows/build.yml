@@ -14,6 +14,7 @@ on:
       - 'index.html'
       - 'build/build.mjs'
       - 'package.json'
+      - '.github/workflows/build.yml'
   workflow_dispatch:
 
 permissions:
@@ -44,7 +45,10 @@ jobs:
 
       - name: Commit the rebuilt file
         run: |
-          if git diff --quiet -- dist/dont-get-deactivated.html; then
+          # NOTE: `git diff --quiet` ignores UNTRACKED files, so a first
+          # build (dist/ not yet in the repo) would look "unchanged".
+          # `git status --porcelain` catches new, modified and deleted.
+          if [ -z "$(git status --porcelain -- dist/dont-get-deactivated.html)" ]; then
             echo "dist unchanged — nothing to commit"
             exit 0
           fi
