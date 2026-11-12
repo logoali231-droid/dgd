@@ -75,12 +75,49 @@ All tests ran in headless Chromium with a **simulated iPhone**
 | End Shift Early (two-tap confirm) | ✅ `screen-deactivated`, reason `quit_early_menu` |
 | Console / page errors | ✅ **none** |
 
+Landscape was tested separately (844×390 viewport, touch), because a phone
+held sideways has very little vertical room. It exposed a **real pre-existing
+bug**: there was no global `.hidden` rule, only per-element ones, and
+`#order-card` (213 px) plus `#order-actions` (44 px) had none — so they stayed
+in the layout during a ride and pushed the pedal **below the fold** (pedal top
+at 690 px in a 390 px viewport). After the fixes below the pedal sits at
+**279–323 px**, fully on screen, with no scrolling:
+
+| Check (landscape 844×390) | Result |
+|---|---|
+| Container switches to two-column | ✅ `flex-direction: row` |
+| Pedal reachable without scrolling | ✅ top 279, bottom 323, visible |
+| Ride canvas capped | ✅ 86 px (`max-height: 22vh`) |
+| Console / page errors | ✅ none |
+
 A separate regression run served the *unmodified* multi-file project over
 `http://localhost` and re-ran the original QA script: full loop, delivery,
 End Shift Early and save/load all still pass with **zero errors**. The
 existing playable loop is intact.
 
 Screenshots from the mobile run are in `qa/shots/offline-*.png`.
+
+---
+
+## 2b. Bugs found and fixed along the way
+
+Both of these were pre-existing and affected **every** device, not just
+phones — landscape testing is simply what surfaced them.
+
+1. **No global `.hidden` utility.** `#order-card` and `#order-actions` are
+   toggled with `classList.add('hidden')`, but neither had a matching CSS
+   rule, so they never actually disappeared. On desktop the tall window hid
+   the problem; on a short viewport it put the pedal off-screen. Added a
+   single `.hidden { display: none !important; }` rule in
+   `styles/utilities.css`.
+2. **Landscape layout overflowed.** A 420 px column in a 390 px-tall
+   viewport left no room for the play area. Reworked the landscape block in
+   `mobile.css`: HUD becomes a left-hand column, the duplicate status line is
+   hidden, and the ride canvas, bars and buttons are all capped so the whole
+   delivery panel fits. The hazard banner is now an overlay instead of an
+   extra row.
+
+No game logic changed for either fix — CSS only.
 
 ---
 
@@ -127,7 +164,9 @@ npm install          # once — installs esbuild
 node build/build.mjs # writes dist/dont-get-deactivated.html
 ```
 
-The script fails loudly if any external reference survives inlining.
+The script fails loudly if any external reference survives inlining. CI
+(`.github/workflows/build.yml`) also rebuilds and commits `dist/` on every
+source change, so the downloadable file always matches the code.
 
 ---
 
@@ -135,21 +174,24 @@ The script fails loudly if any external reference survives inlining.
 
 | File | Change |
 |---|---|
-| `build/build.mjs` | **new** — esbuild bundler: flattens all modules into one IIFE, inlines the four stylesheets and the font as a data URI, strips the external `<link>`/`<script>` tags, writes `dist/dont-get-deactivated.html`. Warns if any external reference remains. |
-| `dist/dont-get-deactivated.html` | **new** — the built game, ~129 KB, zero external references. This is the file you put on the phone. |
-| `styles/mobile.css` | **new** — device-aware layer: `100dvh` + safe-area insets, 44 px minimum touch targets, `touch-action` tuning (the pedal uses `none` so a long press is never eaten by scrolling), larger minimum font sizes on small screens, a **two-column landscape layout** for short viewports, tablet/desktop framing, `prefers-reduced-motion` support, and `:focus-visible` outlines. |
+| `build/build.mjs` | **new** — esbuild bundler: flattens all modules into one IIFE, inlines the five stylesheets (minified) and the font as a data URI, strips the external `<link>`/`<script>` tags, writes `dist/dont-get-deactivated.html`. Warns if any external reference remains. |
+| `dist/dont-get-deactivated.html` | **new** — the built game, ~115 KB, zero external references. This is the file you put on the phone. Rebuilt automatically by CI. |
+| `styles/mobile.css` | **new** — device-aware layer: `100dvh` + safe-area insets, 44 px minimum touch targets, `touch-action` tuning (the pedal uses `none` so a long press is never eaten by scrolling), larger minimum font sizes on small screens, a **two-column landscape layout** that fits a 390 px-tall viewport, tablet/desktop framing, `prefers-reduced-motion` support, and `:focus-visible` outlines. |
+| `styles/utilities.css` | **new** — the global `.hidden { display: none !important; }` utility (see §2b). |
 | `assets/fonts/pressstart2p-latin.woff2` | **new** — self-hosted Latin subset of the pixel font (12.5 KB), so no Google Fonts request is needed. |
 | `styles/variables.css` | added the `@font-face` pointing at the local font. |
-| `index.html` | removed the Google Fonts `<link>`; added `viewport-fit=cover`, `user-scalable=no`, theme colour, apple/mobile web-app meta, manifest and icon links; linked `styles/mobile.css`. |
+| `index.html` | removed the Google Fonts `<link>`; added `viewport-fit=cover`, `user-scalable=no`, theme colour, apple/mobile web-app meta, manifest and icon links; linked `utilities.css` and `mobile.css`. |
+| `.github/workflows/build.yml` | **new** — rebuilds `dist/` on every source change, uploads it as a workflow artifact, and commits the result. Fixed a first-run bug where `git diff --quiet` skipped the commit for a not-yet-tracked file. |
 | `package.json` / `package-lock.json` | **new** — dev dependency on `esbuild` only. The game itself still has **zero runtime dependencies**. |
-| `.gitignore` | **new** — ignores `node_modules/`. |
+| `.gitignore` | **new** — ignores `node_modules/` and the scratch font downloads in `build/`. |
 
 ### What did *not* change
 
 No game logic, no data files, no systems, no UI modules. The ride scene,
 arrival mini-game, End Shift Early, hazards, upgrades and save/load are
 byte-identical to the previous commit — the mobile work is a build step plus
-a CSS layer.
+a CSS layer (the only CSS-side behaviour fix is the missing `.hidden` rule,
+which restores what the JS already intended).
 
 ### Known limitation
 

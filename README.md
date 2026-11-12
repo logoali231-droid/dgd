@@ -33,6 +33,35 @@ If you enjoy this project's inspiration, check out the original game by QuickTur
 
 The original deserves recognition for inspiring this project. Please support its creators!
 
+---
+
+## 📱 Play on a phone, offline
+
+You don't need Node, a localhost server, or an internet connection to play.
+
+**One file does it all:** [`dist/dont-get-deactivated.html`](dist/dont-get-deactivated.html)
+(~115 KB) contains every script, stylesheet and the font inlined. Copy it to
+your phone and open it — no server needed.
+
+**Android:** copy the file to `Download/`, then open it in Chrome.
+**iPhone:** AirDrop it or save it to the Files app, then open it — or use the
+hosted route below if Safari previews instead of running it.
+
+The game also carries PWA metadata, so you can host the repo on any static
+host and **Add to Home Screen** for a full-screen, offline-capable install.
+
+Rebuild the single file after changing the game:
+
+```bash
+npm install
+node build/build.mjs
+```
+
+Full details — what blocked mobile play, what was verified, and phone
+step-by-steps — are in **[MOBILE_OFFLINE.md](MOBILE_OFFLINE.md)**.
+
+---
+
 ## 🎮 The Game
 
 You are a courier for an unnamed delivery platform. Your shift lasts 12 in-game hours. You accept orders, hold a pedal to ride to the customer, release to brake for hazards, boost when things get tight, and try to survive until the clock runs out.
@@ -105,7 +134,8 @@ python3 -m http.server 8099
 ```
 
 (Opening `index.html` directly from the filesystem will not work — ES module
-imports need an HTTP origin.)
+imports need an HTTP origin. For phone/offline play, use the single-file
+build in `dist/` instead, which needs no server at all.)
 
 ### Assets
 
