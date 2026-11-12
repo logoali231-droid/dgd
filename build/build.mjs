@@ -54,9 +54,17 @@ async function inlineCSS() {
             /url\(['"]?\.\.\/assets\/fonts\/pressstart2p-latin\.woff2['"]?\)/g,
             `url(${fontDataUri})`
         );
-        parts.push(`/* ---- ${rel} ---- */\n${css}`);
+        parts.push(css);
     }
-    return parts.join('\n\n');
+
+    // Minify the combined stylesheet (keeps the single file small).
+    const minified = await build({
+        stdin: { contents: parts.join('\n'), loader: 'css' },
+        minify: true,
+        write: false,
+        logLevel: 'warning',
+    });
+    return minified.outputFiles[0].text;
 }
 
 /**

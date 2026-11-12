@@ -1,0 +1,55 @@
+name: Build single-file game
+
+# Rebuilds dist/dont-get-deactivated.html whenever the game source changes,
+# so the downloadable offline build always matches the code in the repo.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'main.js'
+      - 'src/**'
+      - 'styles/**'
+      - 'assets/fonts/**'
+      - 'index.html'
+      - 'build/build.mjs'
+      - 'package.json'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install esbuild
+        run: npm install --no-audit --no-fund
+
+      - name: Build single-file HTML
+        run: node build/build.mjs
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dont-get-deactivated
+          path: dist/dont-get-deactivated.html
+          if-no-files-found: error
+
+      - name: Commit the rebuilt file
+        run: |
+          if git diff --quiet -- dist/dont-get-deactivated.html; then
+            echo "dist unchanged — nothing to commit"
+            exit 0
+          fi
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add dist/dont-get-deactivated.html
+          git commit -m "chore: rebuild single-file offline build [skip ci]"
+          git push
