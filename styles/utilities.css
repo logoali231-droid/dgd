@@ -1,0 +1,18 @@
+/* ============================================================
+   utilities.css — single-purpose helper classes
+   ============================================================ */
+
+/* Global hidden utility.
+   Several elements are toggled from JS with classList.add/remove('hidden')
+   (the order card, its accept/decline row, the delivery panel, the
+   dialogue box...). Each used to rely on its own `#id.hidden { display:
+   none }` rule, and the order card and its actions row had none — so they
+   stayed in the layout while a delivery was in progress, pushing the pedal
+   below the fold on short (landscape phone) screens.
+
+   One rule now covers every element the JS hides. `!important` is needed
+   because the elements it applies to carry display values from more
+   specific `#id` selectors. */
+.hidden {
+    display: none !important;
+}
