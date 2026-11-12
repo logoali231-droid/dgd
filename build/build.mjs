@@ -20,6 +20,7 @@ const OUT_DIR = path.join(ROOT, 'dist');
 const OUT_FILE = path.join(OUT_DIR, 'dont-get-deactivated.html');
 
 const CSS_FILES = [
+    'styles/utilities.css',
     'styles/variables.css',
     'styles/layout.css',
     'styles/components.css',
